@@ -1,0 +1,7 @@
+{
+	"dist": "ubuntu",
+	"language": "php",
+	"server": "apache2",
+	"framework": "yii2",
+	"db": "mysql"
+}
