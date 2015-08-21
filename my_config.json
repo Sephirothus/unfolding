@@ -1,7 +1,8 @@
 {
-	"dist": "ubuntu",
-	"language": "php",
-	"server": "apache2",
-	"framework": "yii2",
-	"db": "mysql"
+	"dists": "ubuntu",
+	"languages": "php",
+	"servers": "apache2",
+	"managers": "composer",
+	"frameworks": "yii2",
+	"databases": "mysql"
 }

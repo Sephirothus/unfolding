@@ -15,24 +15,31 @@ from Config import Config
 #	'build makers like gulp, Grunt',
 # 	'framework'
 # }
+
+# args = {
+# 	'install',
+# 	'update'
+# }
 try:
+	try:
+		arg = sys.argv[1]
+	except IndexError:
+		arg = 'install'
+
 	confClass = Config()
 	conf = {}
-	fileName = 'aa'#'my_config.json'
+	fileName = 'my_config.json'
 
 	if (os.path.isfile(fileName)):
 		with open(fileName) as data_file:
 			conf = json.load(data_file)
 
-		conf['dist'] = Config.dist[conf['dist']]
+		conf = confClass.makeConf(conf)
 	else:
-		conf = confClass.makeConf()
+		conf = confClass.createConf()
 
-	#cl = conf['dist']()
-	# print cl.getConf()
-	#print cl
-	#print conf
-	confClass.getClass(conf['dist'])(conf).install()
+	print conf
+	#confClass.getClass(conf['dist'])(conf).install()
 	
 except KeyboardInterrupt:
 	print "\nBye:)"
