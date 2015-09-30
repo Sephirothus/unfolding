@@ -1,8 +1,12 @@
 {
 	"dists": "ubuntu",
-	"languages": "php",
-	"servers": "apache2",
-	"managers": "composer",
-	"frameworks": "yii2",
-	"databases": "mysql"
+	"languages": {
+        "python": {
+            "version": "3"
+        }, 
+        "php": {
+            "version": "5.6"
+        }
+    },
+	"servers": ["apache", "nginx"]
 }

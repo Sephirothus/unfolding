@@ -20,6 +20,7 @@ from Config import Config
 # 	'install',
 # 	'update'
 # }
+
 try:
 	try:
 		arg = sys.argv[1]
@@ -34,7 +35,7 @@ try:
 		with open(fileName) as data_file:
 			conf = json.load(data_file)
 
-		conf = confClass.makeConf(conf)
+		conf = confClass.checkConf(conf)
 	else:
 		conf = confClass.createConf()
 

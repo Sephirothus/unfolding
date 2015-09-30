@@ -5,7 +5,9 @@ import importlib
 
 class ConfigPaths:
 	dependencies = {
-
+		'servers': 'languages',
+		'managers': 'languages',
+		'frameworks': 'languages',
 	}
 
 	dists = {
@@ -52,28 +54,8 @@ class ConfigPaths:
 	}
 
 class Config:
+
 	data = {}
-
-	def makeConf(self, conf):
-		newConf = []
-		try:
-			for key, val in conf.iteritems():
-				var = getattr(ConfigPaths, key)
-				if (type(var[var.keys()[0]]) is dict):
-					newConf.append(var[conf['languages']][val])
-				else:
-					newConf.append(var[val])
-
-			return newConf
-		except:
-			print sys.exc_info()
-
-	def createConf(self):
-		self.data['dist'] = self.setDist()
-		self.data['language'] = self.setLang()
-		self.data['server'] = self.setServer()
-		# self.data['db'] = self.setDb()
-		return self.getConf()
 
 	def getConf(self):
 		return self.data
@@ -82,6 +64,54 @@ class Config:
 		className = moduleName.rsplit(".", 1)[1]
 		moduleName = __import__(moduleName, fromlist=[className]);
 		return getattr(moduleName, className)
+
+	# =================== Checking ====================== #
+
+	def checkConf(self, conf):
+		newConf = {}
+		try:
+			for key, vals in conf.iteritems():
+				if (type(vals) is list):
+					for val in vals:
+						ret = self.checkDependencies(key, val, conf)
+				elif (type(vals) is dict):
+					for name, params in vals.iteritems():
+						ret = self.checkDependencies(key, name, conf)
+				else:
+					ret = self.checkDependencies(key, vals, conf)
+
+				newConf = ret
+				# var = getattr(ConfigPaths, key)
+				# if (type(var[var.keys()[0]]) is dict):
+				# 	newConf.append(var[conf['languages']][val])
+				# else:
+				# 	newConf.append(var[val])
+
+			return newConf
+		except:
+			print sys.exc_info()
+
+	def checkDependencies(self, folder, className, conf):
+		ret = []
+		curClass = self.getClass(folder + '.' + className.capitalize())()
+		if hasattr(curClass, 'dependencies'):
+			for val in curClass.dependencies:
+				curVal = val.split('.')
+				if curVal[0] in conf:
+					if curVal[1] == conf[curVal[0]] or curVal[1] in conf[curVal[0]].keys():
+						continue
+
+				ret.append(val)
+			return ret
+
+	# =================== Creation ====================== #
+
+	def createConf(self):
+		self.data['dist'] = self.setDist()
+		self.data['language'] = self.setLang()
+		self.data['server'] = self.setServer()
+		# self.data['db'] = self.setDb()
+		return self.getConf()
 
 	def choice(self, arr, question, isRequired=False):
 		string = '===== '+question+' =====\n'
@@ -100,8 +130,6 @@ class Config:
 			print 'not correct number'
 			func = inspect.getouterframes(inspect.currentframe())[1][3]
 			getattr(self, func)()
-
-
 
 	def setDist(self):
 		grep = subprocess.Popen(("cat /etc/lsb-release").split(), stdout=subprocess.PIPE).stdout.read()
