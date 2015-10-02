@@ -1,6 +1,6 @@
 class Apache:
 
-	dependencies = ['languages.php']
+	dependencies = ['dists.Ubuntu', 'languages.Php']
 
 	def config(self):
 		return ''

@@ -3,6 +3,8 @@ import sys
 import inspect
 import importlib
 
+from sets import Set
+
 class ConfigPaths:
 	dependencies = {
 		'servers': 'languages',
@@ -65,44 +67,43 @@ class Config:
 		moduleName = __import__(moduleName, fromlist=[className]);
 		return getattr(moduleName, className)
 
+	def dictAdd(self, val, data):
+		if val not in data:
+			data.append(val)
+
+
 	# =================== Checking ====================== #
 
 	def checkConf(self, conf):
-		newConf = {}
+		queue = []
 		try:
 			for key, vals in conf.iteritems():
 				if (type(vals) is list):
 					for val in vals:
-						ret = self.checkDependencies(key, val, conf)
+						self.checkDependencies(key, val, conf, queue)
 				elif (type(vals) is dict):
 					for name, params in vals.iteritems():
-						ret = self.checkDependencies(key, name, conf)
+						self.checkDependencies(key, name, conf, queue, params)
 				else:
-					ret = self.checkDependencies(key, vals, conf)
+					self.checkDependencies(key, vals, conf, queue)
 
-				newConf = ret
-				# var = getattr(ConfigPaths, key)
-				# if (type(var[var.keys()[0]]) is dict):
-				# 	newConf.append(var[conf['languages']][val])
-				# else:
-				# 	newConf.append(var[val])
-
-			return newConf
+			return queue
 		except:
 			print sys.exc_info()
 
-	def checkDependencies(self, folder, className, conf):
-		ret = []
+	def checkDependencies(self, folder, className, conf, queue, version=False):
 		curClass = self.getClass(folder + '.' + className.capitalize())()
 		if hasattr(curClass, 'dependencies'):
 			for val in curClass.dependencies:
 				curVal = val.split('.')
 				if curVal[0] in conf:
-					if curVal[1] == conf[curVal[0]] or curVal[1] in conf[curVal[0]].keys():
+					if curVal[1] == conf[curVal[0]] or (hasattr(conf[curVal[0]], 'keys') and curVal[1] in conf[curVal[0]].keys()):
 						continue
 
-				ret.append(val)
-			return ret
+				self.dictAdd(self.getClass(val), queue)
+		if version:
+			curClass.version = version
+		self.dictAdd(curClass, queue)
 
 	# =================== Creation ====================== #
 

@@ -1,6 +1,6 @@
 class Nginx:
 
-    dependencies = ['languages.php']
+    dependencies = ['languages.Php']
 
     def config(self):
         return ''

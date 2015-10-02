@@ -35,7 +35,8 @@ try:
 		with open(fileName) as data_file:
 			conf = json.load(data_file)
 
-		conf = confClass.checkConf(conf)
+		queue = confClass.checkConf(conf)
+		print queue
 	else:
 		conf = confClass.createConf()
 
