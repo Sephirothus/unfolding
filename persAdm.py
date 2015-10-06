@@ -35,13 +35,15 @@ try:
 		with open(fileName) as data_file:
 			conf = json.load(data_file)
 
-		queue = confClass.checkConf(conf)
-		print queue
+		queue = confClass.createQueue(conf)
 	else:
-		conf = confClass.createConf()
+		queue = confClass.createQueue(confClass.createConf())
 
-	print conf
-	#confClass.getClass(conf['dist'])(conf).install()
+	print queue
+
+	myDist = confClass.getDist(conf)
+	for el in queue:
+		el.install(myDist)
 	
 except KeyboardInterrupt:
 	print "\nBye:)"

@@ -2,5 +2,5 @@ class Nginx:
 
     dependencies = ['languages.Php']
 
-    def config(self):
-        return ''
+    def install(self, myDist):
+        print "Installing Yii 4.6"

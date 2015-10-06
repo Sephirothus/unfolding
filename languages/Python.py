@@ -1,4 +1,4 @@
 class Python:
     
-    def config(self):
-        return ''
+    def install(self, myDist):
+        return False

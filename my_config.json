@@ -1,8 +1,9 @@
 {
-	"dists": "ubuntu",
-	"languages": {
-        "python": "3", 
-        "php": "5.6"
+    "languages": {
+        "php": {
+            "version": "5.6",
+            "type": "php5-fpm"
+        }
     },
-	"servers": ["apache", "nginx"]
+	"frameworks": "yii"
 }

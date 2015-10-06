@@ -1,6 +1,6 @@
 class Apache:
 
-	dependencies = ['dists.Ubuntu', 'languages.Php']
+	dependencies = ['languages.Php']
 
-	def config(self):
-		return ''
+	def install(self, myDist):
+        print "Installing Apache 2.0"

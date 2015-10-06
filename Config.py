@@ -3,8 +3,6 @@ import sys
 import inspect
 import importlib
 
-from sets import Set
-
 class ConfigPaths:
 	dependencies = {
 		'servers': 'languages',
@@ -67,14 +65,28 @@ class Config:
 		moduleName = __import__(moduleName, fromlist=[className]);
 		return getattr(moduleName, className)
 
-	def dictAdd(self, val, data):
-		if val not in data:
-			data.append(val)
+	def objAdd(self, val, data):
+		for i in data:
+			if i.__class__.__name__ == val.__class__.__name__:
+				return False	
+		data.append(val)
 
+	def ucfirst(self, string):
+		return string[0].upper() + string[1:]
+
+	def getDist(self, conf):
+		distName = ''
+		if 'dists' in conf:
+			distName = conf['dists']
+		else:
+			grep = subprocess.Popen(("cat /etc/lsb-release").split(), stdout=subprocess.PIPE).stdout.read()
+			distName = grep.split('\n')[0].split('=')[1].lower()
+
+		return self.getClass('dists.' + self.ucfirst(distName))()
 
 	# =================== Checking ====================== #
 
-	def checkConf(self, conf):
+	def createQueue(self, conf):
 		queue = []
 		try:
 			for key, vals in conf.iteritems():
@@ -91,8 +103,8 @@ class Config:
 		except:
 			print sys.exc_info()
 
-	def checkDependencies(self, folder, className, conf, queue, version=False):
-		curClass = self.getClass(folder + '.' + className.capitalize())()
+	def checkDependencies(self, folder, className, conf, queue, params=False):
+		curClass = self.getClass(folder + '.' + self.ucfirst(className))()
 		if hasattr(curClass, 'dependencies'):
 			for val in curClass.dependencies:
 				curVal = val.split('.')
@@ -100,10 +112,13 @@ class Config:
 					if curVal[1] == conf[curVal[0]] or (hasattr(conf[curVal[0]], 'keys') and curVal[1] in conf[curVal[0]].keys()):
 						continue
 
-				self.dictAdd(self.getClass(val), queue)
-		if version:
-			curClass.version = version
-		self.dictAdd(curClass, queue)
+				self.checkDependencies(curVal[0], curVal[1], conf, queue)
+
+		if params:
+			curClass.attrs = {}
+			for key, val in params.iteritems():
+				curClass.attrs[key] = val
+		self.objAdd(curClass, queue)
 
 	# =================== Creation ====================== #
 
