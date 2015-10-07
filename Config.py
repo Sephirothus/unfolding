@@ -1,7 +1,8 @@
 import subprocess
 import sys
 import inspect
-import importlib
+
+from Helper import Helper
 
 class ConfigPaths:
 	dependencies = {
@@ -56,33 +57,13 @@ class ConfigPaths:
 class Config:
 
 	data = {}
+	helper = False
+
+	def __init__(self):
+		self.helper = Helper()
 
 	def getConf(self):
 		return self.data
-
-	def getClass(self, moduleName):
-		className = moduleName.rsplit(".", 1)[1]
-		moduleName = __import__(moduleName, fromlist=[className]);
-		return getattr(moduleName, className)
-
-	def objAdd(self, val, data):
-		for i in data:
-			if i.__class__.__name__ == val.__class__.__name__:
-				return False	
-		data.append(val)
-
-	def ucfirst(self, string):
-		return string[0].upper() + string[1:]
-
-	def getDist(self, conf):
-		distName = ''
-		if 'dists' in conf:
-			distName = conf['dists']
-		else:
-			grep = subprocess.Popen(("cat /etc/lsb-release").split(), stdout=subprocess.PIPE).stdout.read()
-			distName = grep.split('\n')[0].split('=')[1].lower()
-
-		return self.getClass('dists.' + self.ucfirst(distName))()
 
 	# =================== Checking ====================== #
 
@@ -104,7 +85,7 @@ class Config:
 			print sys.exc_info()
 
 	def checkDependencies(self, folder, className, conf, queue, params=False):
-		curClass = self.getClass(folder + '.' + self.ucfirst(className))()
+		curClass = self.helper.getClass(folder + '.' + self.helper.ucfirst(className))()
 		if hasattr(curClass, 'dependencies'):
 			for val in curClass.dependencies:
 				curVal = val.split('.')
@@ -118,7 +99,7 @@ class Config:
 			curClass.attrs = {}
 			for key, val in params.iteritems():
 				curClass.attrs[key] = val
-		self.objAdd(curClass, queue)
+		self.helper.objAdd(curClass, queue)
 
 	# =================== Creation ====================== #
 
@@ -148,7 +129,7 @@ class Config:
 			getattr(self, func)()
 
 	def setDist(self):
-		grep = subprocess.Popen(("cat /etc/lsb-release").split(), stdout=subprocess.PIPE).stdout.read()
+		grep = self.helper.execute("cat /etc/lsb-release")
 		dist = grep.split('\n')[0].split('=')[1].lower()
 		if (dist in self.dist): 
 			return self.dist[dist]

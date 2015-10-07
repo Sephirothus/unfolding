@@ -1,6 +1,6 @@
 class Apache:
 
-	dependencies = ['languages.Php']
-
 	def install(self, myDist):
-        print "Installing Apache 2.0"
+        print "==================\nInstalling Apache 2.4\n"
+        myDist.aptGet('apache2')
+        print "=================="

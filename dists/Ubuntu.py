@@ -1,20 +1,20 @@
-import subprocess
+from Helper import Helper
 
 class Ubuntu:
+	
 	conf = {}
+	helper = False
 
 	def __init__(self, conf={}):
 		self.conf = conf
-
-	def execute(self, command):
-		return subprocess.Popen((command).split(), stdout=subprocess.PIPE).stdout.read()
+		self.helper = Helper()
 
 	def aptGet(self, name, rep=False):
 		if rep:
-			self.execute('sudo add-apt-repository ' + rep)
-			self.execute('sudo apt-get update')
+			self.helper.execute('sudo add-apt-repository ' + rep)
+			self.helper.execute('sudo apt-get update')
 
-		print self.execute('sudo apt-get install -y ' + name)
+		print self.helper.execute('sudo apt-get install -y ' + name)
 
 	def install(self):
 		return False
