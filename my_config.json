@@ -1,9 +1,4 @@
 {
-    "languages": {
-        "php": {
-            "version": "5.6",
-            "type": "php5-fpm"
-        }
-    },
+    "languages": "php",
 	"frameworks": "yii"
 }

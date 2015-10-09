@@ -1,7 +1,7 @@
 from Helper import Helper
 
 class Ubuntu:
-	
+
 	conf = {}
 	helper = False
 
@@ -11,10 +11,16 @@ class Ubuntu:
 
 	def aptGet(self, name, rep=False):
 		if rep:
-			self.helper.execute('sudo add-apt-repository ' + rep)
-			self.helper.execute('sudo apt-get update')
+			self.execute('sudo add-apt-repository ' + rep)
+			self.execute('sudo apt-get update')
 
-		print self.helper.execute('sudo apt-get install -y ' + name)
+		print self.execute('sudo apt-get install -y ' + name)
 
 	def install(self):
 		return False
+
+	def execute(self, command):
+		return self.helper.execute(command)
+
+	def createBlock(self, string):
+		return self.helper.createBlock(string)

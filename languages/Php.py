@@ -13,9 +13,7 @@ class Php:
 				elif version == '5.6':
 					rep = 'ppa:ondrej/php5-5.6'
 
-			if 'type' in self.attrs:
-				command = self.attrs['type']
+			command = self.attrs['type'] if 'type' in self.attrs else 'php5'
 
-		print "==================\nInstalling PHP 5\n"
+		myDist.createBlock("Installing PHP 5")
 		myDist.aptGet(command, rep)
-		print "=================="

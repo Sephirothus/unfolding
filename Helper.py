@@ -30,11 +30,15 @@ class Helper:
         return self.getClass('dists.' + self.ucfirst(distName))()
 
     def createBlock(self, data):
-        maxLen = len(max(data))
-        print "=" * (maxLen+4)
-        for el in data:
-            curLen = len(el)
-            print "| " + el + (" " * (maxLen - curLen)) + " |"
+        maxLen = len(max(data)) if type(data) is list else len(data)
+        print "\n" + ("=" * (maxLen+4))
+
+        if type(data) is list:
+            for el in data:
+                curLen = len(el)
+                print "| " + el + (" " * (maxLen - curLen)) + " |"
+        else:
+            print "| " + data + " |"
 
         print "=" * (maxLen+4)
         

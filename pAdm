@@ -52,10 +52,12 @@ try:
 	helper.createBlock(question)
 	isOk = raw_input('is it ok? ').lower()
 
-	if isOk == 'yes':
+	if isOk == 'yes' or isOk == 'y':
 	 	myDist = helper.getDist(conf)
 		for el in queue:
 		 	el.install(myDist)
+
+	helper.createBlock("Installation completed. Thanx for using pAdm:)")
 	
 except KeyboardInterrupt:
 	print "\nBye:)"
