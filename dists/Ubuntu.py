@@ -14,13 +14,25 @@ class Ubuntu:
 			self.execute('sudo add-apt-repository ' + rep)
 			self.execute('sudo apt-get update')
 
-		print self.execute('sudo apt-get install -y ' + name)
+		return self.execute('sudo apt-get install --yes --force-yes ' + name)
 
-	def install(self):
-		return False
+	def composerProject(self, params):
+		return self.execute('sudo composer create-project --prefer-dist '+params)
+
+	def wgetUntar(self, filePath):
+		fileName = filePath.rsplit('/', 1)[1]
+		self.execute('wget -P /tmp ' + filePath)
+		self.execute('tar xvzf /tmp/' + fileName + ' -C /tmp')
+		self.execute('rm /tmp/' + fileName)
 
 	def execute(self, command):
 		return self.helper.execute(command)
 
+	def install(self):
+		return False
+
 	def createBlock(self, string):
 		return self.helper.createBlock(string)
+
+	def editFile(self, fileName, changes):
+		self.helper.editFile(fileName, changes)

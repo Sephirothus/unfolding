@@ -41,4 +41,15 @@ class Helper:
             print "| " + data + " |"
 
         print "=" * (maxLen+4)
+
+    def editFile(self, fileName, changes):
+        fileData = open(fileName, "r")
+        newData = fileData.read()
+        for oldVal, newVal in changes.iteritems():
+            newData = newData.replace(oldVal, newVal)
+        fileData.close()
+
+        fileData = open(fileName, "w")
+        fileData.write(newData)
+        fileData.close()
         

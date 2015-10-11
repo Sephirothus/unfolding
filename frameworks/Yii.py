@@ -7,7 +7,7 @@ class Yii:
         version = self.attrs['version'] if hasattr(self, 'attrs') and 'version' in self.attrs else 'basic'
         folder = self.attrs['folder'] if hasattr(self, 'attrs') and 'folder' in self.attrs else '../yii-application'
 
-        myDist.execute('sudo composer create-project --prefer-dist yiisoft/yii2-app-' + version + ' ' + folder)
+        myDist.composerProject('yiisoft/yii2-app-' + version + ' ' + folder)
         if version == 'advanced':
             myDist.execute('php ' + folder + '/init')
             

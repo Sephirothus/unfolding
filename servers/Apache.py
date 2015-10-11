@@ -1,6 +1,12 @@
 class Apache:
 
 	def install(self, myDist):
-        print "==================\nInstalling Apache 2.4\n"
-        myDist.aptGet('apache2')
-        print "=================="
+		myDist.createBlock("Installing Apache")
+		if self.check(myDist):
+			print "Apache2 already installed"
+		else:
+			myDist.aptGet('apache2')
+
+	def check(self, myDist):
+		exist = myDist.execute("sudo service apache2 status")
+		return "unrecognized service" not in exist

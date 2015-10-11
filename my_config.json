@@ -1,4 +1,3 @@
 {
-    "languages": "php",
-	"frameworks": "yii"
+	"databases": "Rabbitmq"
 }
