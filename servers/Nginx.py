@@ -1,8 +1,11 @@
+from dists.Ubuntu import Ubuntu
+
 class Nginx:
 
-    dependencies = ['languages.Php']
+	dependencies = ['languages.Php']
+	name = 'Nginx'
 
-    def install(self, myDist):
-    	myDist.createBlock("Installing Nginx")
-        myDist.aptGet('nginx')
-        
+	def installUbuntu(self):
+		myDist = Ubuntu()
+		myDist.aptGet('nginx')
+		

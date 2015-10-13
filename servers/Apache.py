@@ -1,12 +1,12 @@
+from dists.Ubuntu import Ubuntu
+
 class Apache:
 
-	def install(self, myDist):
-		myDist.createBlock("Installing Apache")
-		if self.check(myDist):
-			print "Apache2 already installed"
-		else:
-			myDist.aptGet('apache2')
+	name = "Apache"
 
-	def check(self, myDist):
-		exist = myDist.execute("sudo service apache2 status")
-		return "unrecognized service" not in exist
+	def installUbuntu(self):
+		myDist = Ubuntu()
+		myDist.aptGet('apache2')
+
+	def checkUbuntu(self):
+		return "unrecognized service" not in (Ubuntu()).servStatus("apache2")

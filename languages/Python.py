@@ -1,4 +1,4 @@
 class Python:
-    
-    def install(self, myDist):
-        return False
+	
+	def installUbuntu(self):
+		return False

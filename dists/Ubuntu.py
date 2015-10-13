@@ -1,13 +1,6 @@
 from Helper import Helper
 
-class Ubuntu:
-
-	conf = {}
-	helper = False
-
-	def __init__(self, conf={}):
-		self.conf = conf
-		self.helper = Helper()
+class Ubuntu(Helper):
 
 	def aptGet(self, name, rep=False):
 		if rep:
@@ -25,14 +18,8 @@ class Ubuntu:
 		self.execute('tar xvzf /tmp/' + fileName + ' -C /tmp')
 		self.execute('rm /tmp/' + fileName)
 
-	def execute(self, command):
-		return self.helper.execute(command)
-
 	def install(self):
 		return False
 
-	def createBlock(self, string):
-		return self.helper.createBlock(string)
-
-	def editFile(self, fileName, changes):
-		self.helper.editFile(fileName, changes)
+	def servStatus(self, service):
+		return self.execute('sudo service ' + service + ' status')

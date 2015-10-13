@@ -31,9 +31,9 @@ try:
 		arg = 'install'
 
 	confClass = Config()
+	helper = Helper()
 	conf = {}
 	fileName = 'my_config.json'
-	helper = Helper()
 
 	if (os.path.isfile(fileName)):
 		with open(fileName) as data_file:
@@ -53,9 +53,13 @@ try:
 	isOk = raw_input('is it ok? ').lower()
 
 	if isOk == 'yes' or isOk == 'y':
-	 	myDist = helper.getDist(conf)
+		myDist = helper.getDist(conf)
 		for el in queue:
-		 	el.install(myDist)
+			helper.createBlock("Installing " + el.name)
+			if ('check' in dir(el) and el.check()) or ('check' + myDist in dir(el) and getattr(el, 'check' + myDist)()):
+				print el.name + " already installed"
+			else:
+		 		getattr(el, 'install' + myDist)()
 
 	helper.createBlock("Installation completed. Thanx for using pAdm:)")
 	

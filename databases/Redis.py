@@ -1,10 +1,14 @@
+from dists.Ubuntu import Ubuntu
+
 class Redis:
 
-	def install(self, myDist):
+	name = 'Redis'
+
+	def installUbuntu(self):
+		myDist = Ubuntu()
 		port = self.attrs['port'] if hasattr(self, 'attrs') and 'port' in self.attrs else '6379'
 		archPath = '/tmp/redis-stable/'
 
-		myDist.createBlock("Installing Redis") 
 		myDist.wgetUntar('http://download.redis.io/redis-stable.tar.gz')
 		myDist.execute('sudo make -C ' + archPath)
 		myDist.execute('sudo make install -C ' + archPath)

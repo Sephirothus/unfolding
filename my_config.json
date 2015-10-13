@@ -1,3 +1,8 @@
 {
-	"databases": "Rabbitmq"
+	"frameworks": {
+        "yii": {
+            "folder": "/home/konst/yii"
+        }
+    },
+    "languages": "php"
 }
