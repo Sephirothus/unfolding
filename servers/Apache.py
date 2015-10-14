@@ -6,7 +6,7 @@ class Apache:
 
 	def installUbuntu(self):
 		myDist = Ubuntu()
-		myDist.aptGet('apache2')
+		print myDist.aptGet('apache2')
 
 	def checkUbuntu(self):
 		return "unrecognized service" not in (Ubuntu()).servStatus("apache2")

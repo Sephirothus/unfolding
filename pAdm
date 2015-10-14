@@ -21,7 +21,8 @@ from Config import Config
 
 # args = {
 # 	'install',
-# 	'update'
+# 	'update',
+#   'delete'
 # }
 
 try:
@@ -56,12 +57,25 @@ try:
 		myDist = helper.getDist(conf)
 		for el in queue:
 			helper.createBlock("Installing " + el.name)
-			if ('check' in dir(el) and el.check()) or ('check' + myDist in dir(el) and getattr(el, 'check' + myDist)()):
+			# checking
+			if ('check' + myDist in dir(el) and getattr(el, 'check' + myDist)()) or ('check' in dir(el) and el.check()):
 				print el.name + " already installed"
 			else:
-		 		getattr(el, 'install' + myDist)()
+				getattr(el, 'install' + myDist)()
 
-	helper.createBlock("Installation completed. Thanx for using pAdm:)")
+			# configuring
+			if hasattr(el, 'attrs'):
+				if 'configure' + myDist in dir(el):
+					methodName = 'configure' + myDist
+				elif 'configure' in dir(el):
+					methodName = 'configure'
+				else:
+					continue
+
+				getattr(el, methodName)()
+
+
+	helper.createBlock("All completed. Thanx for using pAdm:)")
 	
 except KeyboardInterrupt:
 	print "\nBye:)"

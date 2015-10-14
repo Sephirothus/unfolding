@@ -11,4 +11,6 @@ class Laravel:
 
 		myDist.composerProject('laravel/laravel ' + folder)
 		
+	def configure(self):
 		# TODO db config, apache|nginx config, hosts
+		return False

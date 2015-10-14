@@ -1,8 +1,10 @@
 from dists.Ubuntu import Ubuntu
+from databases.Mysql import Mysql
+from Helper import Helper
 
 class Php:
 
-	name = "Php 5"
+	name = "PHP 5"
 	
 	def installUbuntu(self):
 		myDist = Ubuntu()
@@ -22,5 +24,18 @@ class Php:
 
 		print myDist.aptGet(command, rep)
 
-	def checkUbuntu(self):
-		return "PHP 5" in (Ubuntu()).execute("php --version")
+	def configureUbuntu(self):
+		myDist = Ubuntu()
+		if 'extensions' in self.attrs:
+			exts = self.attrs['extensions']
+			if exts == 'all':
+				exts = 'php5-mcrypt php5-curl php5-gd php5-dev'
+
+				# checking if dbs installed, then istall extensions for them
+				if (Mysql()).check():
+					exts += ' php5-mysql'
+
+			print myDist.aptGet(exts)
+
+	def check(self):
+		return "PHP 5" in (Helper()).execute("php --version")

@@ -9,9 +9,6 @@ class Ubuntu(Helper):
 
 		return self.execute('sudo apt-get install --yes --force-yes ' + name)
 
-	def composerProject(self, params):
-		return self.execute('sudo composer create-project --prefer-dist '+params)
-
 	def wgetUntar(self, filePath):
 		fileName = filePath.rsplit('/', 1)[1]
 		self.execute('wget -P /tmp ' + filePath)

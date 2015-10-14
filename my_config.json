@@ -1,8 +1,16 @@
 {
-	"frameworks": {
-        "yii": {
-            "folder": "/home/konst/yii"
+    "databases": {
+        "mysql": {
+            "db": "padm_test",
+            "user": "padm_user",
+            "password": "1"
         }
     },
-    "languages": "php"
+    "languages": "php",
+    "servers": "apache",
+    "frameworks": {
+        "laravel": {
+            "folder": "/home/konst/laravel"
+        }
+    }
 }

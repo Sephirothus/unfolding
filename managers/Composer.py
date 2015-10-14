@@ -2,7 +2,7 @@ from dists.Ubuntu import Ubuntu
 
 class Composer:
 
-	dependencies = ['languages.Php', 'extensions.PhpCurl']
+	dependencies = ['languages.Php', 'extensions.Curl']
 	name = 'Composer'
 
 	def installUbuntu(self):

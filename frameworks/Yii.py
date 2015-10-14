@@ -14,4 +14,7 @@ class Yii:
 		if version == 'advanced':
 			myDist.execute('php ' + folder + '/init')
 			
+	def configure(self):
 		# TODO db config, apache|nginx config, hosts
+		return False
+		

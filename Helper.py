@@ -54,4 +54,10 @@ class Helper:
 		fileData = open(fileName, "w")
 		fileData.write(newData)
 		fileData.close()
+
+	def composerProject(self, params):
+		return self.execute('sudo composer create-project --prefer-dist '+params)
+
+	def mysqlCommand(self, user='root', password=False):
+		return ' | mysql -u ' + user + (' -p'+password if password else '')
 		
