@@ -1,9 +1,9 @@
-import subprocess
+import subprocess, shlex
 
 class Helper:
 
 	def execute(self, command):
-		return subprocess.Popen((command).split(), stdout=subprocess.PIPE).stdout.read()
+		return subprocess.Popen(shlex.split(command), stdout=subprocess.PIPE).stdout.read()
 	
 	def getClass(self, moduleName):
 		className = moduleName.rsplit(".", 1)[1]
@@ -58,6 +58,6 @@ class Helper:
 	def composerProject(self, params):
 		return self.execute('sudo composer create-project --prefer-dist '+params)
 
-	def mysqlCommand(self, user='root', password=False):
-		return ' | mysql -u ' + user + (' -p'+password if password else '')
+	def mysqlCommand(self, command, user='root', password=False):
+		return 'mysql -u ' + user + (' -p' + password if password else '') + ' -e "' + command + ';"'
 		
