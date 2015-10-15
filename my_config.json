@@ -9,8 +9,13 @@
     "languages": "php",
     "servers": "apache",
     "frameworks": {
-        "laravel": {
-            "folder": "/home/konst/laravel"
+        "yii": {
+            "folder": "/home/konst/yii",
+            "version": "advanced",
+            "siteName": "yii.dev",
+            "db": "padm_test",
+            "user": "padm_user",
+            "password": "1"
         }
     }
 }

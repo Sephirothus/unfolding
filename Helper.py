@@ -45,14 +45,23 @@ class Helper:
 		print "=" * (maxLen+4)
 
 	def editFile(self, fileName, changes):
-		fileData = open(fileName, "r")
+		fileData = open(fileName, "r+")
 		newData = fileData.read()
 		for oldVal, newVal in changes.iteritems():
 			newData = newData.replace(oldVal, newVal)
+
+		fileData.write(newData)
 		fileData.close()
 
-		fileData = open(fileName, "w")
-		fileData.write(newData)
+	def addHost(self, host):
+		self.fileActions('/etc/hosts', 'a', '\n' + host)
+
+	def saveFile(self, filePath, content):
+		self.fileActions(filePath, 'w', content)
+
+	def fileActions(self, fileName, mode, content):
+		fileData = open(fileName, mode)
+		fileData.write(content)
 		fileData.close()
 
 	def composerProject(self, params):
@@ -60,4 +69,3 @@ class Helper:
 
 	def mysqlCommand(self, command, user='root', password=False):
 		return 'mysql -u ' + user + (' -p' + password if password else '') + ' -e "' + command + ';"'
-		

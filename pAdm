@@ -14,9 +14,10 @@ from Config import Config
 # 	'nosql db (redis | mongo)',
 # 	'sphinx | elastic',
 # 	'git | svn',
-#	'dependencies managers - composer(for php)',
+#	'dependencies managers - composer, pear(for php)',
 #	'build makers like gulp, Grunt',
-# 	'framework'
+# 	'framework',
+#	'editors'
 # }
 
 # args = {
@@ -72,10 +73,12 @@ try:
 				else:
 					continue
 
+				print "======= Configuring ======="
 				getattr(el, methodName)()
 
-
-	helper.createBlock("All completed. Thanx for using pAdm:)")
+		helper.createBlock("All completed. Thanx for using pAdm:)")
+	else:
+		helper.createBlock("As you wish. Thanx for using pAdm:)")
 	
 except KeyboardInterrupt:
 	print "\nBye:)"

@@ -33,7 +33,8 @@ class ConfigPaths:
 		'mercurial': 'vcs.Mercurial'
 	}
 	databases = {
-		'mysql': ''
+		'mysql': '',
+		'postgre': ''
 	}
 	servers = {
 		'php': {
@@ -46,6 +47,10 @@ class ConfigPaths:
 			'composer': 'managers.Composer',
 			'pear': 'managers.Pear',
 		}
+	}
+	editors = {
+		'phpshtorm': '',
+		'sublime': ''
 	}
 	frameworks = {
 		'php': {
