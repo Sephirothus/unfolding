@@ -12,18 +12,31 @@ class Apache:
 	def check(self):
 		return "httpd" in (Helper()).execute("sudo apache2ctl --version")
 
-	def addSite(self, siteName, folder, conf=False):
+	def addSite(self, siteName, folder):
+		self.siteActions(siteName, self.siteConf(siteName, folder), '127.0.0.1   ' + siteName)
+
+	def addSiteWithAliases(self, siteName, aliasesAndFolders):
+		conf = ''
+		host = ''
+		for alias, folder in aliasesAndFolders.iteritems():
+			site = alias + '.' + siteName if alias else siteName
+			conf += self.siteConf(site, folder) + "\n\n"
+			host += '127.0.0.1   ' + site + "\n"
+
+		self.siteActions(siteName, conf, host)
+			
+	def siteActions(self, siteName, config, host):
 		helper = Helper()
 		path = '/etc/apache2/sites-available/' + siteName + '.conf'
 
 		print "-- Save config file for server"
-		helper.saveFile(path, conf if conf else self.siteConf(siteName, folder))
+		helper.saveFile(path, config)
 		print "-- Enabling site"
 		helper.execute('sudo a2ensite ' + siteName)
 		print "-- Restart service"
 		helper.execute('sudo service apache2 restart')
 		print "-- Add site to hosts"
-		helper.addHost('127.0.0.1   ' + siteName)
+		helper.addHost(host)
 
 	def siteConf(self, siteName, folder):
 		return "\

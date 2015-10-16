@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from Helper import Helper
 
 class Ubuntu(Helper):
@@ -20,3 +22,7 @@ class Ubuntu(Helper):
 
 	def servStatus(self, service):
 		return self.execute('sudo service ' + service + ' status')
+
+	def checkAptGet(self, package):
+		installed = self.execute('apt-cache policy ' + package)
+		return 'Установлен: (отсутствует)' not in installed and 'Installed: (none)' not in installed

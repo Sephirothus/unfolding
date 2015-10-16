@@ -33,7 +33,7 @@ class Helper:
 
 	def createBlock(self, data):
 		maxLen = len(max(data)) if type(data) is list else len(data)
-		print "\n" + ("=" * (maxLen+4))
+		print "\n+" + ("=" * (maxLen+2)) + "+"
 
 		if type(data) is list:
 			for el in data:
@@ -42,7 +42,7 @@ class Helper:
 		else:
 			print "| " + data + " |"
 
-		print "=" * (maxLen+4)
+		print "+" + ("=" * (maxLen+2)) + "+"
 
 	def editFile(self, fileName, changes):
 		fileData = open(fileName, "r+")

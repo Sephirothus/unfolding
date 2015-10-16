@@ -5,12 +5,6 @@ import inspect
 from Helper import Helper
 
 class ConfigPaths:
-	dependencies = {
-		'servers': 'languages',
-		'managers': 'languages',
-		'frameworks': 'languages',
-	}
-
 	dists = {
 		'ubuntu': 'dists.Ubuntu',
 		'opensuse': 'dists.OpenSuse',
@@ -32,32 +26,24 @@ class ConfigPaths:
 		'svn': 'vcs.Svn',
 		'mercurial': 'vcs.Mercurial'
 	}
-	databases = {
-		'mysql': '',
-		'postgre': ''
-	}
+	databases = [
+		'mysql', 'postgresql', 'mongodb'
+	]
 	servers = {
-		'php': {
-			'apache': 'servers.Apache',
-			'nginx': 'servers.Nginx'
-		}
+		'apache': 'servers.Apache',
+		'nginx': 'servers.Nginx'
 	}
 	managers = {
-		'php': {
-			'composer': 'managers.Composer',
-			'pear': 'managers.Pear',
-		}
+		'composer': 'managers.Composer',
+		'pear': 'managers.Pear',
 	}
-	editors = {
-		'phpshtorm': '',
-		'sublime': ''
-	}
-	frameworks = {
-		'php': {
-			'codeigniter': 'frameworks.Codeigniter',
-			'yii': 'frameworks.yii',
-		}
-	}
+	editors = [
+		'phpshtorm', 'sublime'
+	]
+	frameworks = [
+		'codeigniter', 'yii', 'laravel', 'phalcon', 'symfony', 'cakephp', 
+		'zend', 'FuelPHP', 'kohana', 'phpixie', 'nette'
+	]
 
 class Config:
 

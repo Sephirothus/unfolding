@@ -30,15 +30,15 @@ class Yii:
 		
 		if apache.check():
 			if self.version == 'advanced':
-				conf = apache.siteConf('admin.' + siteName, self.folder + '/backend/web') + "\n\n"
-				conf += apache.siteConf(siteName, self.folder + '/frontend/web')
+				apache.addSiteWithAliases(siteName, {
+					'admin' : self.folder + '/backend/web',
+					'': self.folder + '/frontend/web'
+				})
 			else:
-				conf = apache.siteConf(siteName, self.folder + '/web')
-
-			apache.addSite(siteName, self.folder, conf)
+				apache.addSite(siteName, self.folder + '/web')
 		elif nginx.check():
 			nginx.addSite(siteName, folder)
 
-		if ['db', 'user', 'password'] in self.attrs:
-			print 'yes'
+		#if ['db', 'user', 'password'] in self.attrs:
+		#	print 'yes'
 		
