@@ -5,15 +5,14 @@ class Sublime:
 	name = "Sublime Text"
 	
 	def installUbuntu(self):
+		command = 'sublime-text-installer'
+		rep = 'ppa:webupd8team/sublime-text-3'
 		if hasattr(self, 'attrs'):
 			if 'version' in self.attrs:
 				version = self.attrs['version']
 				if version == '2':
 					command = 'sublime-text'
 					rep = 'ppa:webupd8team/sublime-text-2'
-				elif version == '3':
-					command = 'sublime-text-installer'
-					rep = 'ppa:webupd8team/sublime-text-3'
 
 		print (Ubuntu()).aptGet(command, rep)
 

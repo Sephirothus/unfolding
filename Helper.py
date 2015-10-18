@@ -2,8 +2,10 @@ import subprocess, shlex
 
 class Helper:
 
-	def execute(self, command):
-		return subprocess.Popen(shlex.split(command), stdout=subprocess.PIPE).stdout.read()
+	def execute(self, command, withShell=False):
+		if not withShell:
+			command = shlex.split(command)
+		return subprocess.Popen(command, shell=withShell, stdout=subprocess.PIPE).stdout.read()
 	
 	def getClass(self, moduleName):
 		className = moduleName.rsplit(".", 1)[1]
@@ -19,7 +21,7 @@ class Helper:
 	def ucfirst(self, string):
 		return string[0].upper() + string[1:]
 
-	def getDist(self, conf, onlyName=True):
+	def getDist(self, conf=False, onlyName=True):
 		distName = ''
 		if 'dists' in conf:
 			distName = conf['dists']
@@ -69,3 +71,22 @@ class Helper:
 
 	def mysqlCommand(self, command, user='root', password=False):
 		return 'mysql -u ' + user + (' -p' + password if password else '') + ' -e "' + command + ';"'
+
+	def checkVersion(self, service):
+		try:
+			self.execute(service + ' --version')
+			return True
+		except OSError:
+			return False
+
+	def getMethod(self, method, obj, distName=False):
+		methodName = False
+		if not distName:
+			distName = self.getDist()
+			
+		if method + distName in dir(obj):
+			methodName = method + distName
+		elif method in dir(obj):
+			methodName = method
+
+		return methodName

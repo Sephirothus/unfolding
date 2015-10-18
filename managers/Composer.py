@@ -1,4 +1,5 @@
 from dists.Ubuntu import Ubuntu
+from Helper import Helper
 
 class Composer:
 
@@ -7,8 +8,8 @@ class Composer:
 
 	def installUbuntu(self):
 		myDist = Ubuntu()
-		myDist.execute('sudo curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer')
-		myDist.execute('sudo composer global require "fxp/composer-asset-plugin:~1.0.3"')
+		myDist.execute('curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer', True)
+		myDist.execute('sudo composer global require "fxp/composer-asset-plugin:~1.0.3"', True)
 		
-	def checkUbuntu(self):
-		return "version" in (Ubuntu()).execute("composer --version")
+	def check(self):
+		return (Helper()).checkVersion('composer')

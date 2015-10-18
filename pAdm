@@ -55,26 +55,22 @@ try:
 	isOk = raw_input('is it ok? ').lower()
 
 	if isOk[0] == 'y':
-		myDist = helper.getDist(conf)
+		distName = helper.getDist(conf)
 		for el in queue:
 			helper.createBlock("Installing " + el.name)
 			# checking
-			if ('check' + myDist in dir(el) and getattr(el, 'check' + myDist)()) or ('check' in dir(el) and el.check()):
+			check = helper.getMethod('check', el, distName)
+			if check and getattr(el, check)():
 				print el.name + " already installed"
 			else:
-				getattr(el, 'install' + myDist)()
+				getattr(el, helper.getMethod('install', el, distName))()
 
 			# configuring
 			if hasattr(el, 'attrs'):
-				if 'configure' + myDist in dir(el):
-					methodName = 'configure' + myDist
-				elif 'configure' in dir(el):
-					methodName = 'configure'
-				else:
-					continue
-
-				print "======= Configuring ======="
-				getattr(el, methodName)()
+				configure = helper.getMethod('configure', el, distName)
+				if configure:
+					print "======= Configuring ======="
+					getattr(el, configure)()
 
 		helper.createBlock("All completed. Thanx for using pAdm:)")
 	else:

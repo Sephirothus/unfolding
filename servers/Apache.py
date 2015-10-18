@@ -10,7 +10,7 @@ class Apache:
 		print myDist.aptGet('apache2')
 
 	def check(self):
-		return "httpd" in (Helper()).execute("sudo apache2ctl --version")
+		return (Helper()).checkVersion('apache2ctl')
 
 	def addSite(self, siteName, folder):
 		self.siteActions(siteName, self.siteConf(siteName, folder), '127.0.0.1   ' + siteName)

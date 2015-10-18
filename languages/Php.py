@@ -9,7 +9,7 @@ class Php:
 	def installUbuntu(self):
 		myDist = Ubuntu()
 		rep = False
-		command = ''
+		command = 'php5'
 		if hasattr(self, 'attrs'):
 			if 'version' in self.attrs:
 				version = self.attrs['version']
@@ -19,8 +19,8 @@ class Php:
 					rep = 'ppa:ondrej/php5'
 				elif version == '5.6':
 					rep = 'ppa:ondrej/php5-5.6'
-
-			command = self.attrs['type'] if 'type' in self.attrs else 'php5'
+			if 'type' in self.attrs:
+				command = self.attrs['type']
 
 		print myDist.aptGet(command, rep)
 
@@ -38,4 +38,4 @@ class Php:
 			print myDist.aptGet(exts)
 
 	def check(self):
-		return "PHP 5" in (Helper()).execute("php --version")
+		return (Helper()).checkVersion('php')

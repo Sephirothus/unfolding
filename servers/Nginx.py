@@ -10,7 +10,7 @@ class Nginx:
 		print myDist.aptGet('nginx')
 
 	def check(self):
-		return "nginx" in (Helper()).execute("nginx --version")
+		return (Helper()).checkVersion('nginx')
 
 	def addSite(self, siteName, folder):
 		return False
