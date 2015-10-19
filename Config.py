@@ -90,7 +90,16 @@ class Config:
 			curClass.attrs = {}
 			for key, val in params.iteritems():
 				curClass.attrs[key] = val
-		self.helper.objAdd(curClass, queue)
+		self.helper.listAdd(curClass, queue)
+
+	def sortQueue(self, queue):
+		newQueue = []
+		for val in queue:
+			if hasattr(val, 'sortOrder'):
+				newQueue.append(val)
+
+		self.helper.listMerge(queue, newQueue)
+		return newQueue
 
 	# =================== Creation ====================== #
 

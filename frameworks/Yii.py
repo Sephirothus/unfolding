@@ -6,6 +6,7 @@ from servers.Nginx import Nginx
 class Yii:
 
 	dependencies = ['languages.Php', 'managers.Composer']
+	sortOrder = ["databases.Mysql"]
 	name = 'Yii 2.0'
 
 	version = ''

@@ -12,11 +12,15 @@ class Helper:
 		moduleName = __import__(moduleName, fromlist=[className]);
 		return getattr(moduleName, className)
 
-	def objAdd(self, val, data):
+	def listAdd(self, val, data):
 		for i in data:
 			if i.__class__.__name__ == val.__class__.__name__:
 				return False    
 		data.append(val)
+
+	def listMerge(self, vals, data):
+		for val in vals:
+			self.listAdd(val, data)
 
 	def ucfirst(self, string):
 		return string[0].upper() + string[1:]
