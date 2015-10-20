@@ -4,6 +4,7 @@ from Helper import Helper
 class Composer:
 
 	dependencies = ['languages.Php', 'extensions.Curl']
+	sortOrder = ['languages.Php', 'extensions.Curl']
 	name = 'Composer'
 
 	def installUbuntu(self):

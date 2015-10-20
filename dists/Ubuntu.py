@@ -7,7 +7,7 @@ class Ubuntu(Helper):
 	def aptGet(self, name, rep=False):
 		if rep:
 			self.execute('sudo add-apt-repository ' + rep)
-			self.execute('sudo apt-get update')
+			self.aptGetUpdate()
 
 		return self.execute('sudo apt-get install --yes --force-yes ' + name)
 
@@ -17,6 +17,9 @@ class Ubuntu(Helper):
 
 	def removeAptGet(self, package):
 		return self.execute('sudo apt-get purge --auto-remove ' + package)
+
+	def aptGetUpdate(self):
+		self.execute('sudo apt-get update')
 
 	def wgetUntar(self, filePath):
 		fileName = filePath.rsplit('/', 1)[1]

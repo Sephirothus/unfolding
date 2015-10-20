@@ -1,4 +1,4 @@
-import subprocess, shlex
+import subprocess, shlex, socket
 
 class Helper:
 
@@ -12,6 +12,7 @@ class Helper:
 		moduleName = __import__(moduleName, fromlist=[className]);
 		return getattr(moduleName, className)
 
+	# list of objects actions
 	def listAdd(self, val, data):
 		for i in data:
 			if i.__class__.__name__ == val.__class__.__name__:
@@ -21,6 +22,12 @@ class Helper:
 	def listMerge(self, vals, data):
 		for val in vals:
 			self.listAdd(val, data)
+
+	def listFind(self, val, data):
+		className = val.split('.')[1]
+		for i in data:
+			if i.__class__.__name__ == className:
+				return i
 
 	def ucfirst(self, string):
 		return string[0].upper() + string[1:]
@@ -36,6 +43,9 @@ class Helper:
 		distName = self.ucfirst(distName)
 
 		return distName if onlyName else self.getClass('dists.' + distName)()
+
+	def hostName(self):
+		return socket.gethostname()
 
 	def createBlock(self, data):
 		maxLen = len(max(data)) if type(data) is list else len(data)

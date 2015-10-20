@@ -71,7 +71,7 @@ class Config:
 				else:
 					self.checkDependencies(key, vals, conf, queue)
 
-			return queue
+			return self.sortQueue(queue)
 		except:
 			print sys.exc_info()
 
@@ -96,7 +96,10 @@ class Config:
 		newQueue = []
 		for val in queue:
 			if hasattr(val, 'sortOrder'):
-				newQueue.append(val)
+				for sortEl in val.sortOrder:
+					foundVal = self.helper.listFind(sortEl, queue)
+					if foundVal: self.helper.listAdd(foundVal, newQueue)
+				self.helper.listAdd(val, newQueue)
 
 		self.helper.listMerge(queue, newQueue)
 		return newQueue

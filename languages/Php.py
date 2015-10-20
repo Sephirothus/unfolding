@@ -36,6 +36,7 @@ class Php:
 				if (Mysql()).check():
 					exts += ' php5-mysql'
 
+			print "-- installing " + exts
 			print myDist.aptGet(exts)
 
 	def check(self):
