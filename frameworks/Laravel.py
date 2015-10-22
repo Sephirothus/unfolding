@@ -1,4 +1,5 @@
 from dists.Ubuntu import Ubuntu
+from Helper import Helper
 
 class Laravel:
 
@@ -7,7 +8,7 @@ class Laravel:
 
 	def installUbuntu(self):
 		myDist = Ubuntu()
-		folder = self.attrs['folder'] if hasattr(self, 'attrs') and 'folder' in self.attrs else '../laravel-application'
+		folder = self.attrs['folder'] if hasattr(self, 'attrs') and 'folder' in self.attrs else (Helper()).homeFolder() + 'laravel-application'
 
 		myDist.composerProject('laravel/laravel ' + folder)
 		

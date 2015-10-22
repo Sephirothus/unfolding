@@ -18,7 +18,8 @@ class Sublime:
 
 	def configure(self):
 		# package control https://packagecontrol.io/installation#ST3
-		# add plugins https://mattstauffer.co/blog/sublime-text-3-for-php-developers
+		# add packages https://mattstauffer.co/blog/sublime-text-3-for-php-developers
+		# packages: codeformatter, livereload, autocomplete
 		return False
 
 	def checkUbuntu(self):

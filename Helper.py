@@ -1,3 +1,4 @@
+from os.path import expanduser
 import subprocess, shlex, socket
 
 class Helper:
@@ -47,6 +48,9 @@ class Helper:
 	def hostName(self):
 		return socket.gethostname()
 
+	def homeFolder(self):
+		return expanduser("~") + '/'
+
 	def createBlock(self, data):
 		maxLen = len(max(data)) if type(data) is list else len(data)
 		print "\n+" + ("=" * (maxLen+2)) + "+"
@@ -85,6 +89,17 @@ class Helper:
 
 	def mysqlCommand(self, command, user='root', password=False):
 		return 'mysql -u ' + user + (' -p' + password if password else '') + ' -e "' + command + ';"'
+
+	def setChmod(self, files, folder=''):
+		if folder: folder += '/'
+		paths = ''
+		if type(files) is list:
+			for f in files:
+				paths += folder + f + ' '
+		else:
+			paths += folder + files
+
+		return ('sudo chmod -R 777 ' + paths)
 
 	def checkVersion(self, service):
 		try:
