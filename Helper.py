@@ -65,16 +65,22 @@ class Helper:
 		print "+" + ("=" * (maxLen+2)) + "+"
 
 	def editFile(self, fileName, changes):
-		fileData = open(fileName, "r+")
+		fileData = open(fileName, "r")
 		newData = fileData.read()
+		fileData.close()
 		for oldVal, newVal in changes.iteritems():
 			newData = newData.replace(oldVal, newVal)
+			print newData
 
+		fileData = open(fileName, "w")
 		fileData.write(newData)
 		fileData.close()
 
 	def addHost(self, host):
 		self.fileActions('/etc/hosts', 'a', '\n' + host)
+
+	def removeHost(self, hosts):
+		self.editFile('/etc/hosts', {i: '' for i in hosts})
 
 	def saveFile(self, filePath, content):
 		self.fileActions(filePath, 'w', content)

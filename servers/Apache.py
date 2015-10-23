@@ -4,6 +4,7 @@ from Helper import Helper
 class Apache:
 
 	name = "Apache"
+	path = '/etc/apache2/sites-available/'
 
 	def installUbuntu(self):
 		myDist = Ubuntu()
@@ -13,7 +14,7 @@ class Apache:
 		return (Helper()).checkVersion('apache2ctl')
 
 	def addSite(self, siteName, folder):
-		self.siteActions(siteName, self.siteConf(siteName, folder), '127.0.0.1   ' + siteName)
+		self.siteActions(siteName, self.siteConf(siteName, folder), '127.0.0.1	' + siteName)
 
 	def addSiteWithAliases(self, siteName, aliasesAndFolders):
 		conf = ''
@@ -21,13 +22,13 @@ class Apache:
 		for alias, folder in aliasesAndFolders.iteritems():
 			site = alias + '.' + siteName if alias else siteName
 			conf += self.siteConf(site, folder) + "\n\n"
-			host += '127.0.0.1   ' + site + "\n"
+			host += '127.0.0.1	' + site + "\n"
 
 		self.siteActions(siteName, conf, host)
 			
 	def siteActions(self, siteName, config, host):
 		helper = Helper()
-		path = '/etc/apache2/sites-available/' + siteName + '.conf'
+		path = self.path + siteName + '.conf'
 
 		print "-- Save config file for server"
 		helper.saveFile(path, config)
@@ -37,6 +38,19 @@ class Apache:
 		helper.execute('sudo service apache2 restart')
 		print "-- Add site to hosts"
 		helper.addHost(host)
+
+	def removeSite(self, siteName, hosts):
+		helper = Helper()
+		siteName += '.conf'
+		print "-- Remove server site link"
+		helper.execute('sudo rm ' + self.path + siteName)
+		print "-- Disable server site"
+		helper.execute('sudo a2dissite ' + siteName)
+
+		print "-- Remove hosts"
+		for key, val in enumerate(hosts):
+			hosts[key] = '127.0.0.1	' + val
+		helper.removeHost(hosts)
 
 	def siteConf(self, siteName, folder):
 		return "\

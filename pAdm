@@ -6,6 +6,7 @@ import os.path
 
 from Helper import Helper
 from Config import Config
+from servers.Apache import Apache
 
 # installs = {
 # 	'apache2 | nginx',
@@ -33,7 +34,7 @@ try:
 	except IndexError:
 		arg = 'install'
 
-	confClass = Config()
+	confClass = Config(arg)
 	helper = Helper()
 	conf = {}
 	fileName = 'my_config.json'
@@ -45,8 +46,8 @@ try:
 		queue = confClass.createQueue(conf)
 	else:
 		queue = confClass.createQueue(confClass.createConf())
-
-	question = ["We will install:"]
+	
+	question = ["We will " + arg + ":"]
 	count = 1
 	for el in queue:
 		question.append(str(count) + '. ' + el.__class__.__name__)
@@ -58,20 +59,25 @@ try:
 	if isOk[0] == 'y':
 		distName = helper.getDist(conf)
 		for el in queue:
-			helper.createBlock("Installing " + el.name)
+			helper.createBlock(helper.ucfirst(arg) + ' ' + el.name)
 			# checking
 			check = helper.getMethod('check', el, distName)
+			method = helper.getMethod(arg, el, distName)
 			if check and getattr(el, check)():
-				print el.name + " already installed"
-			else:
-				getattr(el, helper.getMethod('install', el, distName))()
+				if arg != 'install' and method:
+					getattr(el, method)()
+				else:
+					print el.name + " already installed"
+			elif method:
+				getattr(el, method)()
 
-			# configuring
-			if not hasattr(el, 'attrs'): el.attrs = {}
-			configure = helper.getMethod('configure', el, distName)
-			if configure:
-				print "======= Configuring ======="
-				getattr(el, configure)()
+			if arg == 'install':
+				# configuring
+				if not hasattr(el, 'attrs'): el.attrs = {}
+				configure = helper.getMethod('configure', el, distName)
+				if configure:
+					print "======= Configuring ======="
+					getattr(el, configure)()
 
 		helper.createBlock("All completed. Thanx for using pAdm:)")
 	else:

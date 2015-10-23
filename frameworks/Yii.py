@@ -66,6 +66,21 @@ class Yii:
 
 			helper.saveFile(dbFile, dbConf)
 
+	def deleteUbuntu(self):
+		self.getAttrs()
+		helper = Helper()
+		apache = Apache()
+		nginx = Nginx()
+		siteName = self.attrs['siteName'] if 'siteName' in self.attrs else 'yii.dev'
+		hosts = ['admin.' + siteName, siteName]
+		print "-- Remove site folder"
+		helper.execute('sudo rm -rf ' + self.folder)
+
+		if apache.check():
+			apache.removeSite(siteName, hosts)
+		elif nginx.check():
+			nginx.removeSite(siteName, hosts)
+
 	def customDbFile(self, db, user, password, driver='mysql'):
 		return "\
 'class' => 'yii\db\Connection',\n\

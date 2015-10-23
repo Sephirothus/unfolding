@@ -10,7 +10,6 @@
     "servers": "apache",
     "frameworks": {
         "yii": {
-            "folder": "/home/sephirothus/yii",
             "version": "advanced",
             "siteName": "yii.dev",
             "db": "padm_test",
