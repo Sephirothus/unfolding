@@ -26,6 +26,8 @@ from servers.Apache import Apache
 #	'configuration',
 #   'delete'
 # }
+#
+# curl -i https://api.github.com/users/sephirothus - rate limit
 
 try:
 	try:

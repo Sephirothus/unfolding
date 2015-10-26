@@ -10,32 +10,7 @@ class Sublime:
 	packagesFolder = ''
 	packages = {
 		'Package Control': 'https://packagecontrol.io/Package%20Control.sublime-package',
-		'PHP Companion': {
-			'url': 'https://github.com/erichard/SublimePHPCompanion/archive/master.zip',
-			'settings': {[{
-				'fileName': 'Default (Linux).sublime-mousemap',
-				'fileContent': '[\n\
-	{\n\
-		"button": "button1",\n\
-		"count": 1,\n\
-		"modifiers": ["ctrl"],\n\
-		"press_command": "drag_select",\n\
-		"command": "goto_definition"\n\
-	}\n\
-]'
-			}], [{
-				'fileName': 'Default.sublime-keymap',
-				'fileContent': '[\n\
-	{ "keys": ["f6"], "command": "expand_fqcn" },\n\
-	{ "keys": ["shift+f6"], "command": "expand_fqcn", "args": {"leading_separator": true} },\n\
-	{ "keys": ["f5"], "command": "find_use" },\n\
-	{ "keys": ["f4"], "command": "import_namespace" },\n\
-	{ "keys": ["shift+f12"], "command": "goto_definition_scope" }\n\
-	{ "keys": ["f7"], "command": "insert_php_constructor_property" }\n\
-]'
-			}]},
-			'sublimeSupport': '3'
-		},
+		'PHP Companion': self.phpCompanionConf(),
 		'All Autocomplete': 'https://github.com/alienhard/SublimeAllAutocomplete/archive/master.zip',
 		'CodeFormatter': 'https://github.com/akalongman/sublimetext-codeformatter/archive/master.zip',
 		'LiveReload': 'https://github.com/dz0ny/LiveReload-sublimetext2/archive/devel.zip',
@@ -58,10 +33,10 @@ class Sublime:
 
 	def configure(self):
 		self.setPaths()
-		for name, package in self.getPackage.iteritems():
+		for name, package in self.packages.iteritems():
 			print '-- install package "' + name + '"'
 			if type(package) is dict:
-				if 'sublimeSupport' in package and package['sublimeSupport'] != self.attrs['version']:
+				if 'sublimeSupport' in package and 'version' in self.attrs and package['sublimeSupport'] != self.attrs['version']:
 					print 'this package not supported by your version of Sublime Text'
 					continue
 
@@ -89,12 +64,40 @@ class Sublime:
 		self.installedPackagesFolder = self.mainFolder + 'Installed\ Packages/'
 		self.packagesFolder = self.mainFolder + 'Packages/'
 
-	def getPackage(self, packageUrl, packageType='installed'):
+	def getPackage(self, packageUrl, packageType='packages'):
 		helper = Helper()
-		folder = self.installedPackagesFolder if packageType == 'installed' else self.packagesFolder
+		folder = self.packagesFolder if packageType == 'packages' else self.installedPackagesFolder
 		filePath = folder + '/' + packageUrl.rsplit('/', 1)[1]
 		if not helper.checkFile(filePath): helper.wgetUnpack(packageUrl, folder)
 
 	def setSettings(self, fileName, fileContent):
 		helper = Helper()
 		helper.fileActions(self.mainFolder + 'Packages/User/' + fileName, 'a', fileContent)
+
+	def phpCompanionConf(self):
+		return {
+			'url': 'https://github.com/erichard/SublimePHPCompanion/archive/master.zip',
+			'settings': [{
+				'fileName': 'Default (Linux).sublime-mousemap',
+				'fileContent': '[\n\
+	{\n\
+		"button": "button1",\n\
+		"count": 1,\n\
+		"modifiers": ["ctrl"],\n\
+		"press_command": "drag_select",\n\
+		"command": "goto_definition"\n\
+	}\n\
+]'
+			}, {
+				'fileName': 'Default.sublime-keymap',
+				'fileContent': '[\n\
+	{ "keys": ["f6"], "command": "expand_fqcn" },\n\
+	{ "keys": ["shift+f6"], "command": "expand_fqcn", "args": {"leading_separator": true} },\n\
+	{ "keys": ["f5"], "command": "find_use" },\n\
+	{ "keys": ["f4"], "command": "import_namespace" },\n\
+	{ "keys": ["shift+f12"], "command": "goto_definition_scope" },\n\
+	{ "keys": ["f7"], "command": "insert_php_constructor_property" }\n\
+]'
+			}],
+			'sublimeSupport': '3'
+		}
