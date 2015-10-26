@@ -7,7 +7,7 @@ class Git:
 
 	def installUbuntu(self):
 		ubuntu = Ubuntu()
-		ubuntu.execute('wget -P /etc/bash_completion.d/ https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash')
+		ubuntu.wget('https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash', '/etc/bash_completion.d/')
 		print ubuntu.aptGet('git')
 
 	def check(self):

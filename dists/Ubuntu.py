@@ -21,12 +21,6 @@ class Ubuntu(Helper):
 	def aptGetUpdate(self):
 		self.execute('sudo apt-get update')
 
-	def wgetUntar(self, filePath):
-		fileName = filePath.rsplit('/', 1)[1]
-		self.execute('wget -P /tmp ' + filePath)
-		self.execute('tar xvzf /tmp/' + fileName + ' -C /tmp')
-		self.execute('rm /tmp/' + fileName)
-
 	def install(self):
 		return False
 

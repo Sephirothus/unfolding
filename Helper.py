@@ -1,5 +1,5 @@
 from os.path import expanduser
-import subprocess, shlex, socket
+import subprocess, shlex, socket, os.path
 
 class Helper:
 
@@ -64,13 +64,27 @@ class Helper:
 
 		print "+" + ("=" * (maxLen+2)) + "+"
 
+	def wget(self, filePath, folder):
+		self.execute('wget -P ' + folder + ' ' + filePath)
+
+	def wgetUnpack(self, filePath, destination='/tmp'):
+		fileName = filePath.rsplit('/', 1)[1]
+		fileExt = fileName.split('.', 1)[1]
+		
+		self.wget(filePath, '/tmp')
+		if fileExt == 'tar.gz':
+			self.execute('tar xvzf /tmp/' + fileName + ' -C ' + destination)
+		elif fileExt == 'zip':
+			self.execute('unzip /tmp/' + fileName + ' -d ' + destination)
+
+		self.execute('rm /tmp/' + fileName)
+
 	def editFile(self, fileName, changes):
 		fileData = open(fileName, "r")
 		newData = fileData.read()
 		fileData.close()
 		for oldVal, newVal in changes.iteritems():
 			newData = newData.replace(oldVal, newVal)
-			print newData
 
 		fileData = open(fileName, "w")
 		fileData.write(newData)
@@ -89,6 +103,9 @@ class Helper:
 		fileData = open(fileName, mode)
 		fileData.write(content)
 		fileData.close()
+
+	def checkFile(self, fileName):
+		return os.path.isfile(fileName)
 
 	def composerProject(self, params):
 		return self.execute('sudo composer create-project --prefer-dist '+params)

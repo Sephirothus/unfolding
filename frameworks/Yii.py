@@ -22,6 +22,7 @@ class Yii:
 		myDist = Ubuntu()
 		self.getAttrs()
 		myDist.composerProject('yiisoft/yii2-app-' + self.version + ' ' + self.folder)
+		# https://github.com/yiisoft/yii2/releases/download/2.0.6/yii-' + self.version + '-app-2.0.6.tgz
 		if self.version == 'advanced':
 			myDist.execute('sudo php ' + self.folder + '/init --env="Development"')
 			

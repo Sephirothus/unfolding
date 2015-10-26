@@ -2,7 +2,6 @@
 
 import sys
 import json
-import os.path
 
 from Helper import Helper
 from Config import Config
@@ -39,7 +38,7 @@ try:
 	conf = {}
 	fileName = 'my_config.json'
 
-	if (os.path.isfile(fileName)):
+	if helper.checkFile(fileName):
 		with open(fileName) as data_file:
 			conf = json.load(data_file)
 

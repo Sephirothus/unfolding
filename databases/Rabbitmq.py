@@ -8,7 +8,7 @@ class Rabbitmq:
 		myDist = Ubuntu()
 		
 		myDist.execute('sudo echo "deb http://www.rabbitmq.com/debian/ testing main" >> /etc/apt/sources.list')
-		myDist.execute('wget -P /tmp http://www.rabbitmq.com/rabbitmq-signing-key-public.asc')
+		myDist.wget('http://www.rabbitmq.com/rabbitmq-signing-key-public.asc', '/tmp')
 		myDist.execute('sudo apt-key add /tmp/rabbitmq-signing-key-public.asc')
 		myDist.aptGetUpdate()
 		myDist.aptGet('rabbitmq-server')
