@@ -69,10 +69,10 @@ class Helper:
 
 	def wgetUnpack(self, filePath, destination='/tmp'):
 		fileName = filePath.rsplit('/', 1)[1]
-		fileExt = fileName.split('.', 1)[1]
+		fileExt = fileName.rsplit('.', 1)[1]
 		
 		self.wget(filePath, '/tmp')
-		if fileExt == 'tar.gz':
+		if fileExt == 'gz':
 			self.execute('tar xvzf /tmp/' + fileName + ' -C ' + destination)
 		elif fileExt == 'zip':
 			self.execute('unzip /tmp/' + fileName + ' -d ' + destination)
