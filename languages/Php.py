@@ -5,7 +5,7 @@ from Helper import Helper
 class Php:
 
 	name = "PHP 5"
-	sortOrder = ["databases.Mysql"]
+	sortOrder = ["databases"]
 	
 	def installUbuntu(self):
 		myDist = Ubuntu()

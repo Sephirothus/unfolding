@@ -1,5 +1,5 @@
 from os.path import expanduser
-import subprocess, shlex, socket, os.path
+import subprocess, shlex, socket, os.path, inspect
 
 class Helper:
 
@@ -25,9 +25,13 @@ class Helper:
 			self.listAdd(val, data)
 
 	def listFind(self, val, data):
-		className = val.split('.')[1]
+		className = val.split('.')
 		for i in data:
-			if i.__class__.__name__ == className:
+			if len(className) == 1:
+				folder = inspect.getfile(i.__class__).split('/')[-2]
+				if folder == className[0]:
+					return i
+			elif len(className) == 2 and i.__class__.__name__ == className[1]:
 				return i
 
 	def ucfirst(self, string):
@@ -110,8 +114,11 @@ class Helper:
 	def composerProject(self, params):
 		return self.execute('sudo composer create-project --prefer-dist '+params)
 
-	def mysqlCommand(self, command, user='root', password=False):
+	def mysqlCommand(self, command, user='root', password='1'):
 		return 'mysql -u ' + user + (' -p' + password if password else '') + ' -e "' + command + ';"'
+
+	def postgreCommand(self, command, user='postgres', password='postgres'):
+		return 'psql -U ' + user + (' -W' + password if password else '') + ' -c "' + command + ';"'
 
 	def setChmod(self, files, folder=''):
 		if folder: folder += '/'

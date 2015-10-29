@@ -8,16 +8,6 @@ class Sublime:
 	mainFolder = ''
 	installedPackagesFolder = ''
 	packagesFolder = ''
-	packages = {
-		'Package Control': 'https://packagecontrol.io/Package%20Control.sublime-package',
-		'PHP Companion': self.phpCompanionConf(),
-		'All Autocomplete': 'https://github.com/alienhard/SublimeAllAutocomplete/archive/master.zip',
-		'CodeFormatter': 'https://github.com/akalongman/sublimetext-codeformatter/archive/master.zip',
-		'LiveReload': 'https://github.com/dz0ny/LiveReload-sublimetext2/archive/devel.zip',
-		'HTML Prettify': 'https://github.com/victorporof/Sublime-HTMLPrettify/archive/master.zip',
-		'SublimeCodeIntel': 'https://github.com/SublimeCodeIntel/SublimeCodeIntel/archive/master.zip',
-		'PhpCodeGen': 'https://bitbucket.org/bteryek/phpcodegen/get/18c3d92b5a32.zip'
-	}
 	
 	def installUbuntu(self):
 		command = 'sublime-text-installer'
@@ -33,14 +23,14 @@ class Sublime:
 
 	def configure(self):
 		self.setPaths()
-		for name, package in self.packages.iteritems():
+		for name, package in self.getPackages().iteritems():
 			print '-- install package "' + name + '"'
 			if type(package) is dict:
 				if 'sublimeSupport' in package and 'version' in self.attrs and package['sublimeSupport'] != self.attrs['version']:
 					print 'this package not supported by your version of Sublime Text'
 					continue
 
-				self.getPackage(package['url'])
+				self.installPackage(package['url'])
 				if 'settings' in package:
 					settings = package['settings']
 					if type(settings) is list:
@@ -49,7 +39,7 @@ class Sublime:
 					else: 
 						self.setSettings(settings['fileName'], settings['fileContent'])
 			else:
-				self.getPackage(package)
+				self.installPackage(package)
 
 		# package control https://packagecontrol.io/installation#ST3
 		# add packages https://mattstauffer.co/blog/sublime-text-3-for-php-developers
@@ -64,7 +54,7 @@ class Sublime:
 		self.installedPackagesFolder = self.mainFolder + 'Installed\ Packages/'
 		self.packagesFolder = self.mainFolder + 'Packages/'
 
-	def getPackage(self, packageUrl, packageType='packages'):
+	def installPackage(self, packageUrl, packageType='packages'):
 		helper = Helper()
 		folder = self.packagesFolder if packageType == 'packages' else self.installedPackagesFolder
 		filePath = folder + '/' + packageUrl.rsplit('/', 1)[1]
@@ -73,6 +63,18 @@ class Sublime:
 	def setSettings(self, fileName, fileContent):
 		helper = Helper()
 		helper.fileActions(self.mainFolder + 'Packages/User/' + fileName, 'a', fileContent)
+
+	def getPackages(self):
+		return {
+			'Package Control': 'https://packagecontrol.io/Package%20Control.sublime-package',
+			'PHP Companion': self.phpCompanionConf(),
+			'All Autocomplete': 'https://github.com/alienhard/SublimeAllAutocomplete/archive/master.zip',
+			'CodeFormatter': 'https://github.com/akalongman/sublimetext-codeformatter/archive/master.zip',
+			'LiveReload': 'https://github.com/dz0ny/LiveReload-sublimetext2/archive/devel.zip',
+			'HTML Prettify': 'https://github.com/victorporof/Sublime-HTMLPrettify/archive/master.zip',
+			'SublimeCodeIntel': 'https://github.com/SublimeCodeIntel/SublimeCodeIntel/archive/master.zip',
+			'PhpCodeGen': 'https://bitbucket.org/bteryek/phpcodegen/get/18c3d92b5a32.zip'
+		}
 
 	def phpCompanionConf(self):
 		return {

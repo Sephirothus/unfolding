@@ -4,6 +4,7 @@ from Helper import Helper
 class Laravel:
 
 	dependencies = ['languages.Php', 'managers.Composer']
+	sortOrder = ["databases"]
 	name = 'Laravel 5'
 
 	def installUbuntu(self):

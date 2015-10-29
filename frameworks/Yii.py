@@ -8,7 +8,7 @@ from databases.Mysql import Mysql
 class Yii:
 
 	dependencies = ['languages.Php', 'managers.Composer']
-	sortOrder = ["databases.Mysql", 'languages.Php', 'managers.Composer']
+	sortOrder = ["databases"]
 	name = 'Yii 2.0'
 
 	version = ''

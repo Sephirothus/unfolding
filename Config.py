@@ -101,7 +101,10 @@ class Config:
 				for sortEl in val.sortOrder:
 					foundVal = self.helper.listFind(sortEl, queue)
 					if foundVal: self.helper.listAdd(foundVal, newQueue)
-				self.helper.listAdd(val, newQueue)
+			if hasattr(val, 'dependencies'):
+				for sortEl in val.dependencies:
+					foundVal = self.helper.listFind(sortEl, queue)
+					if foundVal: self.helper.listAdd(foundVal, newQueue)
 
 		self.helper.listMerge(queue, newQueue)
 		return newQueue
