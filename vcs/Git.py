@@ -13,8 +13,9 @@ class Git:
 		
 	def configure(self):
 		helper = Helper()
-		print "-- add bash completion"
-		helper.wget('https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash', '/etc/bash_completion.d/')
+		if not helper.checkFile('/etc/bash_completion.d/git-completion.bash'):
+			print "-- add bash completion"
+			helper.wget('https://raw.githubusercontent.com/git/git/master/contrib/completion/git-completion.bash', '/etc/bash_completion.d/')
 
 		if 'name' in self.attrs:
 			print "-- set your name in git config"
@@ -24,8 +25,9 @@ class Git:
 			fileName = helper.homeFolder() + '.ssh/id_rsa'
 			print "-- set your email in git config"
 			helper.execute('git config --global user.email "' + self.attrs['email'] + '"')
-			if 'passphrase' in self.attrs:
+			if 'passphrase' in self.attrs and len(self.attrs['passphrase']) > 4:
 				print "-- create ssh key for auto-authorization (add string below to https://github.com/settings/ssh)"
 				if not helper.checkFile(fileName):
+					helper.execute('mkdir ' + helper.homeFolder() + '.ssh')
 					helper.execute('ssh-keygen -f "' + fileName + '" -N "' + self.attrs['passphrase'] + '" -t rsa -C "' + self.attrs['email'] + '"')
 				print helper.execute('cat ' + fileName + '.pub')

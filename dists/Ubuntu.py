@@ -15,7 +15,10 @@ class Ubuntu(Helper):
 		installed = self.execute('apt-cache policy ' + package)
 		return installed and 'Установлен: (отсутствует)' not in installed and 'Installed: (none)' not in installed
 
-	def removeAptGet(self, package):
+	def removeAptGet(self, package, rep=False):
+		if rep:
+			self.execute('sudo add-apt-repository --remove ' + rep)
+			self.aptGetUpdate()
 		return self.execute('sudo apt-get purge --auto-remove ' + package)
 
 	def aptGetUpdate(self):

@@ -68,14 +68,14 @@ class Helper:
 
 		print "+" + ("=" * (maxLen+2)) + "+"
 
-	def wget(self, filePath, folder):
-		self.execute('wget -P ' + folder + ' ' + filePath)
+	def wget(self, filePath, folder, params=''):
+		self.execute('wget -P ' + folder + ' ' + filePath + ' ' + params)
 
-	def wgetUnpack(self, filePath, destination='/tmp'):
+	def wgetUnpack(self, filePath, destination='/tmp', params=''):
 		fileName = filePath.rsplit('/', 1)[1]
 		fileExt = fileName.rsplit('.', 1)[1]
 		
-		self.wget(filePath, '/tmp')
+		self.wget(filePath, '/tmp', params)
 		if fileExt == 'gz':
 			self.execute('tar xvzf /tmp/' + fileName + ' -C ' + destination)
 		elif fileExt == 'zip':
@@ -108,11 +108,14 @@ class Helper:
 		fileData.write(content)
 		fileData.close()
 
+	def rm(self, files):
+		self.execute('sudo rm -rf ' + files, True)
+
 	def checkFile(self, fileName):
 		return os.path.isfile(fileName)
 
 	def composerProject(self, params):
-		return self.execute('sudo composer create-project --prefer-dist '+params)
+		return self.execute('sudo composer create-project --prefer-dist ' + params)
 
 	def mysqlCommand(self, command, user='root', password='1'):
 		return 'mysql -u ' + user + (' -p' + password if password else '') + ' -e "' + command + ';"'
