@@ -12,7 +12,7 @@ class Rabbitmq:
 		myDist.execute('sudo apt-key add /tmp/rabbitmq-signing-key-public.asc')
 		myDist.aptGetUpdate()
 		myDist.aptGet('rabbitmq-server')
-		myDist.execute('sudo rm /tmp/rabbitmq-signing-key-public.asc')
+		myDist.rm('/tmp/rabbitmq-signing-key-public.asc')
 
 	def checkUbuntu(self):
 		return "Status of node" in (Ubuntu()).servStatus("rabbitmq-server")
