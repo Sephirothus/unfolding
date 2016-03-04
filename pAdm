@@ -21,19 +21,25 @@ from Config import Config
 # args = {
 # 	'install',
 # 	'update',
-#	'configuration',
+#	'configure',
 #   'delete'
 # }
 #
 # curl -i https://api.github.com/users/sephirothus - rate limit
 
 try:
-	try:
-		arg = sys.argv[1]
-	except IndexError:
-		arg = 'install'
+	options = {
+		'-a': 'install', # action
+		'-d': '1', # with dependencies
+		'-c': '1' # with configuration
+	}
 
-	confClass = Config(arg)
+	for arg in sys.argv:
+		arg = arg.split('=')
+		if (arg[0] in options): options[arg[0]] = arg[1] if len(arg) == 2 else options[arg[0]]
+
+	confClass = Config(options['-d'])
+	action = options['-a']
 	helper = Helper()
 	conf = {}
 	fileName = 'my_config.json'
@@ -46,7 +52,7 @@ try:
 	else:
 		queue = confClass.createQueue(confClass.createConf())
 	
-	question = ["We will " + arg + ":"]
+	question = ["We will " + action + ":"]
 	count = 1
 	for el in queue:
 		question.append(str(count) + '. ' + el.__class__.__name__)
@@ -58,19 +64,19 @@ try:
 	if isOk[0] == 'y':
 		distName = helper.getDist(conf)
 		for el in queue:
-			helper.createBlock(helper.ucfirst(arg) + ' ' + el.name)
+			helper.createBlock(helper.ucfirst(action) + ' ' + el.name)
 			# checking
 			check = helper.getMethod('check', el, distName)
-			method = helper.getMethod(arg, el, distName)
+			method = helper.getMethod(action, el, distName)
 			if check and getattr(el, check)():
-				if arg != 'install' and method:
+				if action != 'install' and method:
 					getattr(el, method)()
 				else:
 					print el.name + " already installed"
 			elif method:
 				getattr(el, method)()
 
-			if arg == 'install':
+			if action in ['install', 'configure'] and options['-c'] == '1':
 				# configuring
 				if not hasattr(el, 'attrs'): el.attrs = {}
 				configure = helper.getMethod('configure', el, distName)

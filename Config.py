@@ -49,10 +49,10 @@ class Config:
 
 	data = {}
 	helper = False
-	argument = False
+	withDependencies = False
 
 	def __init__(self, arg):
-		self.argument = arg
+		self.withDependencies = arg
 		self.helper = Helper()
 
 	def getConf(self):
@@ -79,7 +79,7 @@ class Config:
 
 	def checkDependencies(self, folder, className, conf, queue, params=False):
 		curClass = self.helper.getClass(folder + '.' + self.helper.ucfirst(className))()
-		if hasattr(curClass, 'dependencies') and self.argument == 'install':
+		if hasattr(curClass, 'dependencies') and self.withDependencies == '1':
 			for val in curClass.dependencies:
 				curVal = val.split('.')
 				if curVal[0] in conf:
