@@ -6,8 +6,10 @@ class Npm:
 	name = 'npm'
 
 	def installUbuntu(self):
-		myDist = Ubuntu()
-		print myDist.aptGet('npm')
+		print (Ubuntu()).aptGet('npm')
 
 	def check(self):
 		return (Helper()).checkVersion('npm')
+
+	def deleteUbuntu(self):
+		return (Ubuntu()).removeAptGet('npm')

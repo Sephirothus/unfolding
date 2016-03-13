@@ -4,13 +4,48 @@ from Helper import Helper
 
 class Php:
 
-	name = "PHP 5"
+	name = "PHP"
 	sortOrder = ["databases"]
 	
 	def installUbuntu(self):
 		myDist = Ubuntu()
+		command = self.getCommandName()
+		print myDist.aptGet(command['command'], command['rep'], command['version'])
+		print myDist.aptGet(command['command'] + ('-fpm' if command['isFpm'] else ''))
+
+	def configureUbuntu(self):
+		modules = self.getModules()
+		if (modules):
+			print "-- installing " + modules
+			print (Ubuntu()).aptGet(modules)
+
+	def check(self):
+		return (Helper()).checkVersion('php')
+
+	def deleteUbuntu(self):
+		command = self.getCommandName()
+		return (Ubuntu()).removeAptGet(command['command'] + '*', command['rep'])
+
+	def getModules(self):
+		modules = False
+		command = self.getCommandName()['command']
+		if 'modules' in self.attrs:
+			modules = self.attrs['modules']
+			if modules == 'default':
+				modules = ['mcrypt', 'curl', 'gd', 'intl', 'json']
+
+				# checking if dbs installed, then install extensions for them
+				if (Mysql()).check():
+					modules.append('mysql')
+
+			modules = ' '.join([command + '-' + mod for mod in modules])
+		return modules
+
+	def getCommandName(self):
 		rep = False
 		command = 'php5'
+		version = False
+		isFpm = False
 		if hasattr(self, 'attrs'):
 			if 'version' in self.attrs:
 				version = self.attrs['version']
@@ -20,24 +55,11 @@ class Php:
 					rep = 'ppa:ondrej/php5'
 				elif version == '5.6':
 					rep = 'ppa:ondrej/php5-5.6'
-			if 'type' in self.attrs:
-				command = self.attrs['type']
+				elif version == '7.0':
+					rep = 'ppa:ondrej/php'
+					command = 'php7.0'
+					version = False
+			if 'is_fpm' in self.attrs:
+				isFpm = self.attrs['is_fpm']
 
-		print myDist.aptGet(command, rep)
-
-	def configureUbuntu(self):
-		myDist = Ubuntu()
-		if 'extensions' in self.attrs:
-			exts = self.attrs['extensions']
-			if exts == 'all':
-				exts = 'php5-mcrypt php5-curl php5-gd php5-dev'
-
-				# checking if dbs installed, then istall extensions for them
-				if (Mysql()).check():
-					exts += ' php5-mysql'
-
-			print "-- installing " + exts
-			print myDist.aptGet(exts)
-
-	def check(self):
-		return (Helper()).checkVersion('php')
+		return {'command': command, 'rep': rep, 'isFpm': isFpm, 'version': version}

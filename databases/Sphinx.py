@@ -9,7 +9,7 @@ class Sphinx:
 		myDist = Ubuntu()
 		print myDist.aptGet('sphinxsearch')
 
-	def removeUbuntu(self):
+	def deleteUbuntu(self):
 		return (Ubuntu()).removeAptGet('sphinxsearch')
 
 	def check(self):

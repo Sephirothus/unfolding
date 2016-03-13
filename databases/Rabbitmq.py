@@ -16,3 +16,6 @@ class Rabbitmq:
 
 	def checkUbuntu(self):
 		return "Status of node" in (Ubuntu()).servStatus("rabbitmq-server")
+
+	def deleteUbuntu(self):
+		return (Ubuntu()).removeAptGet('rabbitmq-server')

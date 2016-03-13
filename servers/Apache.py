@@ -13,6 +13,9 @@ class Apache:
 	def check(self):
 		return (Helper()).checkVersion('apache2ctl')
 
+	def deleteUbuntu(self):
+		return (Ubuntu()).removeAptGet('apache2')
+
 	def addSite(self, siteName, folder):
 		self.siteActions(siteName, self.siteConf(siteName, folder), '127.0.0.1	' + siteName)
 

@@ -11,7 +11,7 @@ class Mysql:
 		myDist.execute('echo "mysql-server mysql-server/root_password_again password 1" | sudo debconf-set-selections', True)
 		print myDist.aptGet('mysql-server')
 
-	def removeUbuntu(self):
+	def deleteUbuntu(self):
 		return (Ubuntu()).removeAptGet('mysql-server')
 		
 	def configure(self):

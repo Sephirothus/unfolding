@@ -12,6 +12,9 @@ class Nginx:
 	def check(self):
 		return (Helper()).checkVersion('nginx')
 
+	def deleteUbuntu(self):
+		return (Ubuntu()).removeAptGet('nginx')
+
 	def addSite(self, siteName, folder):
 		return False
 		

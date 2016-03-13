@@ -55,7 +55,7 @@ try:
 	question = ["We will " + action + ":"]
 	count = 1
 	for el in queue:
-		question.append(str(count) + '. ' + el.__class__.__name__)
+		question.append(str(count) + '. ' + el.name)
 		count += 1
 
 	helper.createBlock(question)
@@ -71,12 +71,14 @@ try:
 			if check and getattr(el, check)():
 				if action != 'install' and method:
 					getattr(el, method)()
+				elif not method:
+					print "There's no action " + action
 				else:
 					print el.name + " already installed"
 			elif method:
 				getattr(el, method)()
 
-			if action in ['install', 'configure'] and options['-c'] == '1':
+			if action in ['install', 'update'] and options['-c'] == '1':
 				# configuring
 				if not hasattr(el, 'attrs'): el.attrs = {}
 				configure = helper.getMethod('configure', el, distName)

@@ -8,6 +8,9 @@ class Git:
 	def installUbuntu(self):
 		print (Ubuntu()).aptGet('git')
 
+	def deleteUbuntu(self):
+		return (Ubuntu()).removeAptGet('git')
+
 	def check(self):
 		return (Helper()).checkVersion('git')
 		

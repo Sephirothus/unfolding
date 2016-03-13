@@ -9,7 +9,7 @@ class Ruby:
 		myDist = Ubuntu()
 		print myDist.aptGet('ruby-full')
 
-	def removeUbuntu(self):
+	def deleteUbuntu(self):
 		return (Ubuntu()).removeAptGet('ruby-full')
 
 	def check(self):

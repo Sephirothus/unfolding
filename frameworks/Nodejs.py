@@ -9,7 +9,7 @@ class Nodejs:
 		myDist = Ubuntu()
 		print myDist.aptGet('nodejs')
 
-	def removeUbuntu(self):
+	def deleteUbuntu(self):
 		return (Ubuntu()).removeAptGet('nodejs')
 
 	def check(self):
