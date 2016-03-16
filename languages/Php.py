@@ -10,8 +10,8 @@ class Php:
 	def installUbuntu(self):
 		myDist = Ubuntu()
 		command = self.getCommandName()
-		print myDist.aptGet(command['command'], command['rep'], command['version'])
-		print myDist.aptGet(command['command'] + ('-fpm' if command['isFpm'] else ''))
+		print myDist.aptGet(command['command'], command['rep'], command['key'], command['version'])
+		if command['isFpm']: print myDist.aptGet(command['command'] + '-fpm')
 
 	def configureUbuntu(self):
 		modules = self.getModules()
@@ -46,6 +46,7 @@ class Php:
 		command = 'php5'
 		version = False
 		isFpm = False
+		key = False
 		if hasattr(self, 'attrs'):
 			if 'version' in self.attrs:
 				version = self.attrs['version']
@@ -59,7 +60,12 @@ class Php:
 					rep = 'ppa:ondrej/php'
 					command = 'php7.0'
 					version = False
-			if 'is_fpm' in self.attrs:
+				elif version == 'hhvm':
+					key = '--recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0x5a16e7281be7a449'
+					rep = 'deb http://dl.hhvm.com/ubuntu ' + (Helper()).execute('lsb_release -sc').strip() + ' main'
+					command = 'hhvm'
+					version = False
+			if 'is_fpm' in self.attrs and ('version' not in self.attrs or self.attrs['version'] != 'hhvm'):
 				isFpm = self.attrs['is_fpm']
 
-		return {'command': command, 'rep': rep, 'isFpm': isFpm, 'version': version}
+		return {'command': command, 'rep': rep, 'isFpm': isFpm, 'version': version, 'key': key}

@@ -56,7 +56,7 @@ class Helper:
 		return expanduser("~") + '/'
 
 	def createBlock(self, data):
-		maxLen = len(max(data)) if type(data) is list else len(data)
+		maxLen = max(len(s) for s in data) if type(data) is list else len(data)
 		print "\n+" + ("=" * (maxLen+2)) + "+"
 
 		if type(data) is list:
