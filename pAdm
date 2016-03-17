@@ -55,7 +55,8 @@ try:
 	question = ["We will " + action + ":"]
 	count = 1
 	for el in queue:
-		question.append(str(count) + '. ' + el.name)
+		version = ' ' + el.attrs['version'] + ' version' if hasattr(el, 'attrs') and 'version' in el.attrs else ''
+		question.append(str(count) + '. ' + el.name + version)
 		count += 1
 
 	helper.createBlock(question)
@@ -68,15 +69,18 @@ try:
 			# checking
 			check = helper.getMethod('check', el, distName)
 			method = helper.getMethod(action, el, distName)
-			if check and getattr(el, check)():
-				if action != 'install' and method:
-					getattr(el, method)()
-				elif not method:
-					print "There's no action " + action
-				else:
-					print el.name + " already installed"
-			elif method:
-				getattr(el, method)()
+			if not method:
+				print "There's no action " + action
+				continue
+
+			if action == 'install':
+				if check and getattr(el, check)(): print el.name + " already installed"
+				else: getattr(el, method)()
+			else:
+				if not check:
+					print "Cannot check instance, no check method"
+					continue
+				if getattr(el, check)(): getattr(el, method)()
 
 			if action in ['install', 'update'] and options['-c'] == '1':
 				# configuring
