@@ -3,10 +3,16 @@ import subprocess, shlex, socket, os.path, inspect
 
 class Helper:
 
+	logFileName = 'commands.log'
+
 	def execute(self, command, withShell=False):
+		rawCommand = command
 		if not withShell:
 			command = shlex.split(command)
-		return subprocess.Popen(command, shell=withShell, stdout=subprocess.PIPE).stdout.read()
+		output = subprocess.Popen(command, shell=withShell, stdout=subprocess.PIPE).stdout.read()
+		# log command and it's output
+		self.fileActions(self.logFileName, 'a', '>>>>> ' + rawCommand + "\n" + output)
+		return output
 	
 	def getClass(self, moduleName):
 		className = moduleName.rsplit(".", 1)[1]
@@ -69,7 +75,9 @@ class Helper:
 		print "+" + ("=" * (maxLen+2)) + "+"
 
 	def wget(self, filePath, folder, params=''):
+		fileName = filePath.rsplit('/', 1)[1]
 		self.execute('wget -P ' + folder + ' ' + filePath + ' ' + params)
+		return folder.rstrip('/') + '/' + fileName
 
 	def wgetUnpack(self, filePath, destination='/tmp', params=''):
 		fileName = filePath.rsplit('/', 1)[1]
@@ -81,7 +89,7 @@ class Helper:
 		elif fileExt == 'zip':
 			self.execute('unzip /tmp/' + fileName + ' -d ' + destination)
 
-		self.execute('rm /tmp/' + fileName)
+		self.rm('/tmp/' + fileName)
 
 	def editFile(self, fileName, changes):
 		fileData = open(fileName, "r")
@@ -132,7 +140,7 @@ class Helper:
 		else:
 			paths += folder + files
 
-		return ('sudo chmod -R 777 ' + paths)
+		return self.execute('sudo chmod -R 777 ' + paths)
 
 	def checkVersion(self, service):
 		try:

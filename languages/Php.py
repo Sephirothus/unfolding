@@ -1,5 +1,7 @@
 from dists.Ubuntu import Ubuntu
 from databases.Mysql import Mysql
+from servers.Apache import Apache
+from servers.Nginx import Nginx
 from Helper import Helper
 
 class Php:
@@ -10,21 +12,31 @@ class Php:
 	def installUbuntu(self):
 		myDist = Ubuntu()
 		command = self.getCommandName()
-		print myDist.aptGet(command['command'], command['rep'], command['key'], command['version'])
-		if command['isFpm']: print myDist.aptGet(command['command'] + '-fpm')
+		myDist.aptGet(command['command'], command['rep'], command['key'], command['version'])
+		if command['isFpm']: myDist.aptGet(command['command'] + '-fpm')
 
 	def configureUbuntu(self):
-		modules = self.getModules()
-		if (modules):
-			print "-- installing " + modules
-			print (Ubuntu()).aptGet(modules)
+		myDist = Ubuntu()
+		command = self.getCommandName()['command']
+		if (command == 'hhvm'):
+			myDist.execute('/usr/share/hhvm/install_fastcgi.sh')
+		else:
+			modules = self.getModules()
+			if (modules):
+				print "-- installing " + modules
+				print myDist.aptGet(modules)
 
 	def check(self):
 		return (Helper()).checkVersion('php')
 
 	def deleteUbuntu(self):
+		myDist = Ubuntu()
 		command = self.getCommandName()
-		return (Ubuntu()).removeAptGet(command['command'] + '*', command['rep'])
+		if command['command'] == 'hhvm': 
+			myDist.execute('/usr/share/hhvm/uninstall_fastcgi.sh')
+			(Apache()).restart()
+			(Nginx()).restart()
+		myDist.removeAptGet(command['command'] + '*', command['rep'])
 
 	def getModules(self):
 		modules = False

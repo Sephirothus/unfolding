@@ -16,6 +16,9 @@ class Apache:
 	def deleteUbuntu(self):
 		return (Ubuntu()).removeAptGet('apache2')
 
+	def restart(self):
+		(Helper()).execute('sudo service apache2 restart')
+
 	def addSite(self, siteName, folder):
 		self.siteActions(siteName, self.siteConf(siteName, folder), '127.0.0.1	' + siteName)
 
@@ -38,7 +41,7 @@ class Apache:
 		print "-- Enabling site"
 		helper.execute('sudo a2ensite ' + siteName)
 		print "-- Restart service"
-		helper.execute('sudo service apache2 restart')
+		self.restart()
 		print "-- Add site to hosts"
 		helper.addHost(host)
 

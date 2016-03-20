@@ -15,6 +15,9 @@ class Nginx:
 	def deleteUbuntu(self):
 		return (Ubuntu()).removeAptGet('nginx')
 
+	def restart(self):
+		(Helper()).execute('sudo service nginx restart')
+
 	def addSite(self, siteName, folder):
 		return False
 		

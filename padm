@@ -81,6 +81,7 @@ try:
 					print "Cannot check instance, no check method"
 					continue
 				if getattr(el, check)(): getattr(el, method)()
+				else: print el.name + " is not installed"
 
 			if action in ['install', 'update'] and options['-c'] == '1':
 				# configuring

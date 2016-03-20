@@ -25,15 +25,12 @@ class Ubuntu(Helper):
 
 	def removeAptGet(self, package, rep = False):
 		if rep:
-			self.execute('sudo add-apt-repository --remove --yes ' + rep)
+			self.execute('sudo add-apt-repository --remove --yes "' + rep + '"')
 			self.aptGetUpdate()
 		return self.execute('sudo apt-get purge --auto-remove --yes ' + package)
 
 	def aptGetUpdate(self):
 		self.execute('sudo apt-get update')
-
-	def install(self):
-		return False
 
 	def servStatus(self, service):
 		return self.execute('sudo service ' + service + ' status')
