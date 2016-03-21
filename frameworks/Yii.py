@@ -12,11 +12,11 @@ class Yii:
 	name = 'Yii 2.0'
 
 	version = ''
-	folder = ''
+	folder = '/var/www/yii-application'
 
 	def getAttrs(self):
 		self.version = self.attrs['version'] if hasattr(self, 'attrs') and 'version' in self.attrs else 'basic'
-		self.folder = self.attrs['folder'] if hasattr(self, 'attrs') and 'folder' in self.attrs else (Helper()).homeFolder() + 'yii-application'
+		if hasattr(self, 'attrs') and 'folder' in self.attrs: self.folder = self.attrs['folder']
 
 	def installUbuntu(self):
 		myDist = Ubuntu()
@@ -39,16 +39,14 @@ class Yii:
 		else:
 			helper.setChmod(['assets/', 'runtime/'], self.folder)
 
+		if self.version == 'advanced': path = {'admin' : self.folder + '/backend/web', '': self.folder + '/frontend/web'}
+		else: path = self.folder + '/web'
 		if apache.check():
-			if self.version == 'advanced':
-				apache.addSiteWithAliases(siteName, {
-					'admin' : self.folder + '/backend/web',
-					'': self.folder + '/frontend/web'
-				})
-			else:
-				apache.addSite(siteName, self.folder + '/web')
+			print "-- Creating apache config"
+			helper.addSite(apache, siteName, path)
 		elif nginx.check():
-			nginx.addSite(siteName, self.folder)
+			print "-- Creating nginx config"
+			helper.addSite(nginx, siteName, path)
 
 		if all (k in self.attrs for k in ['db', 'user', 'password']):
 			if 'driver' in self.attrs:
@@ -78,9 +76,11 @@ class Yii:
 		helper.execute('sudo rm -rf ' + self.folder)
 
 		if apache.check():
-			apache.removeSite(siteName, hosts)
+			print "-- Remove apache config"
+			helper.removeSite(apache, siteName, hosts)
 		elif nginx.check():
-			nginx.removeSite(siteName, hosts)
+			print "-- Remove nginx config"
+			helper.removeSite(nginx, siteName, hosts)
 
 	def customDbFile(self, db, user, password, driver='mysql'):
 		return "\

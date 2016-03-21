@@ -160,3 +160,42 @@ class Helper:
 			methodName = method
 
 		return methodName
+
+	# server (apache, nginx) actions
+	def serverAddSite(self, server, siteName, folder):
+		config = ''
+		host = ''
+		# if folder is dictionary, then keys are aliases and values are paths
+		if (type(folder) is dict):
+			for alias, path in folder.iteritems():
+				site = alias + '.' + siteName if alias else siteName
+				config += server.siteConf(site, path) + "\n\n"
+				host += '127.0.0.1	' + site + "\n"
+		else:
+			config = server.siteConf(siteName, folder)
+			host = '127.0.0.1	' + siteName
+
+		siteName += '.conf'
+		path = server.path + siteName
+
+		print "-- Save config file for server"
+		self.saveFile(path, config)
+		print "-- Enabling site"
+		server.enableSite(siteName)
+		print "-- Restart service"
+		server.restart()
+		print "-- Add site to hosts"
+		self.addHost(host)
+
+	def serverRemoveSite(self, server, siteName, hosts):
+		siteName += '.conf'
+		print "-- Remove server site link"
+		self.execute('sudo rm ' + server.path + siteName)
+		print "-- Disable server site"
+		server.disableSite(siteName)
+		print "-- Restart service"
+		server.restart()
+		print "-- Remove hosts"
+		for key, val in enumerate(hosts):
+			hosts[key] = '127.0.0.1	' + val
+		self.removeHost(hosts)

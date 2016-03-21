@@ -7,11 +7,13 @@ class Laravel:
 	sortOrder = ["databases"]
 	name = 'Laravel 5'
 
+	folder = '/var/www/laravel-application'
+
 	def installUbuntu(self):
 		myDist = Ubuntu()
-		folder = self.attrs['folder'] if hasattr(self, 'attrs') and 'folder' in self.attrs else (Helper()).homeFolder() + 'laravel-application'
+		if hasattr(self, 'attrs') and 'folder' in self.attrs: self.folder = self.attrs['folder']
 
-		myDist.composerProject('laravel/laravel ' + folder)
+		myDist.composerProject('laravel/laravel ' + self.folder)
 		
 	def configure(self):
 		# TODO db config, apache|nginx config, hosts
