@@ -4,15 +4,16 @@ from Helper import Helper
 class Mysql:
 
 	name = "MySQL"
+	packages = ['mysql-server', 'mariadb-server', 'percona-server-server-5.6']
 	
 	def installUbuntu(self):
 		myDist = Ubuntu()
 		myDist.execute('echo "mysql-server mysql-server/root_password password 1" | sudo debconf-set-selections', True)
 		myDist.execute('echo "mysql-server mysql-server/root_password_again password 1" | sudo debconf-set-selections', True)
-		print myDist.aptGet('mysql-server')
+		print myDist.aptGet(self.getPackage())
 
 	def deleteUbuntu(self):
-		return (Ubuntu()).removeAptGet('mysql-server')
+		return (Ubuntu()).removeAptGet(self.getPackage())
 		
 	def configure(self):
 		helper = Helper()
@@ -30,3 +31,6 @@ class Mysql:
 
 	def check(self):
 		return (Helper()).checkVersion('mysql')
+
+	def getPackage(self):
+		return self.attrs['build'] if 'build' in self.attrs and self.attrs['build'] in self.packages else self.packages[0]

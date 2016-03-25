@@ -3,6 +3,7 @@ import subprocess, shlex, socket, os.path, inspect
 
 class Helper:
 
+	supportedDists = ['ubuntu', 'opensuse', 'fedora', 'linuxmint', 'debian', 'gentoo', 'archlinux', 'centos', 'mageia']
 	logFileName = 'commands.log'
 
 	def execute(self, command, withShell=False):
@@ -43,16 +44,17 @@ class Helper:
 	def ucfirst(self, string):
 		return string[0].upper() + string[1:]
 
-	def getDist(self, conf=False, onlyName=True):
+	def getDist(self, conf=False, onlyName=False):
 		distName = ''
 		if 'dists' in conf:
 			distName = conf['dists']
 		else:
-			grep = self.execute("cat /etc/lsb-release")
-			distName = grep.split('\n')[0].split('=')[1].lower()
+			grep = self.execute("cat /etc/os-release")
+			distName = grep.split('\n')[0].split('=')[1].strip('"')
 
-		distName = self.ucfirst(distName)
-
+		if (distName.lower() not in self.supportedDists): raise Exception('Unknown or unsupported linux distributive')
+		
+		distName = self.ucfirst(distName.lower())
 		return distName if onlyName else self.getClass('dists.' + distName)()
 
 	def hostName(self):

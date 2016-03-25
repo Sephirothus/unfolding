@@ -40,8 +40,8 @@ class Php:
 
 	def getModules(self):
 		modules = False
-		command = self.getCommandName()['command']
 		if 'modules' in self.attrs:
+			command = self.getCommandName()['command']
 			modules = self.attrs['modules']
 			if modules == 'default':
 				modules = ['mcrypt', 'curl', 'gd', 'intl', 'json']

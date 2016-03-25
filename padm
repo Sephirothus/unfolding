@@ -63,8 +63,11 @@ try:
 	isOk = raw_input('is it ok? ').lower()
 
 	if isOk[0] == 'y':
-		distName = helper.getDist(conf)
+		dist = helper.getDist(conf)
+		distName = dist.__class__.__name__
 		for el in queue:
+			# set current distributive as object parameter
+			el.curDist = dist
 			helper.createBlock(helper.ucfirst(action) + ' ' + el.name)
 			# checking
 			check = helper.getMethod('check', el, distName)
@@ -95,6 +98,8 @@ try:
 	else:
 		helper.createBlock("As you wish. Thanx for using pAdm:)")
 	
+except Exception as e:
+	print str(e)
 except KeyboardInterrupt:
 	print "\nBye:)"
 	
