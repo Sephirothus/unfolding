@@ -41,6 +41,11 @@ class Helper:
 			elif len(className) == 2 and i.__class__.__name__ == className[1]:
 				return i
 
+	def mergeDicts(self, first, second):
+		data = first.copy()
+		data.update(second)
+		return data
+
 	def ucfirst(self, string):
 		return string[0].upper() + string[1:]
 
@@ -93,6 +98,14 @@ class Helper:
 
 		self.rm('/tmp/' + fileName)
 
+	def dpkg(self, filePath):
+		self.execute('dpkg -i ' + filePath)
+
+	def wgetDpkg(self, filePath):
+		file = self.wget(filePath, '/tmp')
+		self.dpkg(file)
+		self.rm(file)
+
 	def editFile(self, fileName, changes):
 		fileData = open(fileName, "r")
 		newData = fileData.read()
@@ -128,10 +141,10 @@ class Helper:
 		return self.execute('sudo composer create-project --prefer-dist ' + params)
 
 	def mysqlCommand(self, command, user='root', password='1'):
-		return 'mysql -u ' + user + (' -p' + password if password else '') + ' -e "' + command + ';"'
+		return self.execute('mysql -u ' + user + (' -p' + password if password else '') + ' -e "' + command + ';"')
 
 	def postgreCommand(self, command, user='postgres', password='postgres'):
-		return 'psql -U ' + user + (' -W' + password if password else '') + ' -c "' + command + ';"'
+		return self.execute('psql -U ' + user + (' -W' + password if password else '') + ' -c "' + command + ';"')
 
 	def setChmod(self, files, folder=''):
 		if folder: folder += '/'
@@ -144,9 +157,16 @@ class Helper:
 
 		return self.execute('sudo chmod -R 777 ' + paths)
 
-	def checkVersion(self, service):
+	def debConfSetSelections(self, params):
+		if type(params) != str: params = '\n'.join(params)
+		self.execute('echo "' + params + '" | sudo debconf-set-selections', True)
+
+	def getLsbRelease(self):
+		return self.execute('lsb_release -sc').strip()
+
+	def checkVersion(self, service, versCom = '--version'):
 		try:
-			self.execute(service + ' --version')
+			self.execute(service + ' ' + versCom)
 			return True
 		except OSError:
 			return False
@@ -162,6 +182,11 @@ class Helper:
 			methodName = method
 
 		return methodName
+
+	def execMethod(self, method, obj, params = False):
+		if method in dir(obj):
+			return getattr(obj, method)(params)
+		return False
 
 	# server (apache, nginx) actions
 	def serverAddSite(self, server, siteName, folder):

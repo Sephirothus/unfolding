@@ -1,4 +1,3 @@
-from dists.Ubuntu import Ubuntu
 from Helper import Helper
 
 class Sublime:
@@ -19,7 +18,7 @@ class Sublime:
 					command = 'sublime-text'
 					rep = 'ppa:webupd8team/sublime-text-2'
 
-		print (Ubuntu()).aptGet(command, rep)
+		self.curDist.aptGet(command, rep)
 
 	def configure(self):
 		self.setPaths()
@@ -45,8 +44,7 @@ class Sublime:
 		# add packages https://mattstauffer.co/blog/sublime-text-3-for-php-developers
 
 	def checkUbuntu(self):
-		ubuntu = Ubuntu()
-		return ubuntu.checkAptGet('sublime-text-installer') or ubuntu.checkAptGet('sublime-text')
+		return self.curDist.checkAptGet('sublime-text-installer') or self.curDist.checkAptGet('sublime-text')
 
 	def setPaths(self):
 		helper = Helper()

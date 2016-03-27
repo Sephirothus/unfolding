@@ -1,16 +1,15 @@
 from Helper import Helper
-from dists.Ubuntu import Ubuntu
 
 class Nodejs:
 
 	name = 'Node.js'
+	serviceName = 'nodejs'
 
 	def installUbuntu(self):
-		myDist = Ubuntu()
-		print myDist.aptGet('nodejs')
+		self.curDist.aptGet(self.serviceName)
 
 	def deleteUbuntu(self):
-		return (Ubuntu()).removeAptGet('nodejs')
+		self.curDist.removeAptGet(self.serviceName)
 
 	def check(self):
-		return (Helper()).checkVersion('nodejs')
+		return (Helper()).checkVersion(self.serviceName)

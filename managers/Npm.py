@@ -1,15 +1,14 @@
 from Helper import Helper
-from dists.Ubuntu import Ubuntu
 
 class Npm:
 
 	name = 'npm'
 
 	def installUbuntu(self):
-		print (Ubuntu()).aptGet('npm')
+		self.curDist.aptGet(self.name)
 
 	def check(self):
-		return (Helper()).checkVersion('npm')
+		return (Helper()).checkVersion(self.name)
 
 	def deleteUbuntu(self):
-		return (Ubuntu()).removeAptGet('npm')
+		self.curDist.removeAptGet(self.name)

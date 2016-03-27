@@ -1,4 +1,3 @@
-from dists.Ubuntu import Ubuntu
 from Helper import Helper
 
 class Nginx:
@@ -10,17 +9,16 @@ class Nginx:
 	pathEnabled = '/etc/nginx/sites-enabled/'
 
 	def installUbuntu(self):
-		myDist = Ubuntu()
-		print myDist.aptGet(self.serviceName)
+		self.curDist.aptGet(self.serviceName)
 
 	def check(self):
-		return (Helper()).checkVersion(self.serviceName)
+		return (Helper()).checkVersion(self.serviceName, '-v')
 
 	def deleteUbuntu(self):
-		return (Ubuntu()).removeAptGet(self.serviceName)
+		self.curDist.removeAptGet(self.serviceName)
 
 	def restart(self):
-		(Helper()).execute('sudo service ' + self.serviceName + ' restart')
+		(Helper()).execute('sudo /etc/init.d/' + self.serviceName + ' restart')
 
 	def enableSite(self, siteName):
 		(Helper()).execute('sudo ln -s ' + self.pathAvailable + '/' + siteName + ' ' + self.pathEnabled)

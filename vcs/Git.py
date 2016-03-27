@@ -1,18 +1,18 @@
-from dists.Ubuntu import Ubuntu
 from Helper import Helper
 
 class Git:
 
 	name = "Git"
+	serviceName = 'git'
 
 	def installUbuntu(self):
-		print (Ubuntu()).aptGet('git')
+		print self.curDist.aptGet(self.serviceName)
 
 	def deleteUbuntu(self):
-		return (Ubuntu()).removeAptGet('git')
+		return self.curDist.removeAptGet(self.serviceName)
 
 	def check(self):
-		return (Helper()).checkVersion('git')
+		return (Helper()).checkVersion(self.serviceName)
 		
 	def configure(self):
 		helper = Helper()

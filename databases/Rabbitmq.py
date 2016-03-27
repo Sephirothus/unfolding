@@ -1,5 +1,3 @@
-from dists.Ubuntu import Ubuntu
-
 class Rabbitmq:
 
 	name = 'RabbitMQ'
@@ -8,13 +6,12 @@ class Rabbitmq:
 	key = 'http://www.rabbitmq.com/rabbitmq-signing-key-public.asc'
 
 	def installUbuntu(self):
-		myDist = Ubuntu()
-		key = myDist.wget(self.key, '/tmp')
-		myDist.aptGet(self.serviceName, self.repository, key)
-		myDist.rm(key)
+		key = self.curDist.wget(self.key, '/tmp')
+		self.curDist.aptGet(self.serviceName, self.repository, key)
+		self.curDist.rm(key)
 
 	def checkUbuntu(self):
-		return "Status of node" in (Ubuntu()).servStatus(self.serviceName)
+		return "Status of node" in self.curDist.servStatus(self.serviceName)
 
 	def deleteUbuntu(self):
-		return (Ubuntu()).removeAptGet(self.serviceName, self.repository)
+		self.curDist.removeAptGet(self.serviceName, self.repository)

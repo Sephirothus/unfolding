@@ -1,4 +1,3 @@
-from dists.Ubuntu import Ubuntu
 from Helper import Helper
 
 class Apache:
@@ -6,19 +5,19 @@ class Apache:
 	name = "Apache"
 	serviceName = 'apache2'
 	path = '/etc/apache2/sites-available/'
+	commandName = 'apache2ctl'
 
 	def installUbuntu(self):
-		myDist = Ubuntu()
-		print myDist.aptGet(self.serviceName)
+		self.curDist.aptGet(self.serviceName)
 
 	def check(self):
-		return (Helper()).checkVersion('apache2ctl')
+		return (Helper()).checkVersion(self.commandName)
 
 	def deleteUbuntu(self):
-		return (Ubuntu()).removeAptGet(self.serviceName)
+		self.curDist.removeAptGet(self.serviceName)
 
 	def restart(self):
-		(Helper()).execute('sudo service ' + self.serviceName + ' restart')
+		(Helper()).execute('sudo /etc/init.d/' + self.serviceName + ' restart')
 
 	def enableSite(self, siteName):
 		(Helper()).execute('sudo a2ensite ' + siteName)

@@ -1,17 +1,17 @@
-from dists.Ubuntu import Ubuntu
 from Helper import Helper
 
 class Sphinx:
 
 	name = "Sphinx"
+	serviceName = 'sphinxsearch'
+	serverName = 'searchd'
 	
 	def installUbuntu(self):
-		myDist = Ubuntu()
-		print myDist.aptGet('sphinxsearch')
+		self.curDist.aptGet(self.serviceName)
 
 	def deleteUbuntu(self):
-		return (Ubuntu()).removeAptGet('sphinxsearch')
+		self.curDist.removeAptGet(self.serviceName)
 
 	def check(self):
-		return (Helper()).checkVersion('searchd')
+		return (Helper()).checkVersion(self.serverName)
 		

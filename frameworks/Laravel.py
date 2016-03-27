@@ -1,4 +1,3 @@
-from dists.Ubuntu import Ubuntu
 from Helper import Helper
 
 class Laravel:
@@ -10,10 +9,8 @@ class Laravel:
 	folder = '/var/www/laravel-application'
 
 	def installUbuntu(self):
-		myDist = Ubuntu()
 		if hasattr(self, 'attrs') and 'folder' in self.attrs: self.folder = self.attrs['folder']
-
-		myDist.composerProject('laravel/laravel ' + self.folder)
+		self.curDist.composerProject('laravel/laravel ' + self.folder)
 		
 	def configure(self):
 		# TODO db config, apache|nginx config, hosts
