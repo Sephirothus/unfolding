@@ -3,8 +3,10 @@ from Helper import Helper
 class Mysql:
 
 	name = "MySQL"
+
 	serverName = 'mysql'
 	defaultRootPass = '1'
+	defaultPackage = 'mysql'
 	packages = {
 		'mysql': 'mysql-server', 
 		'mariadb': {
@@ -25,7 +27,7 @@ class Mysql:
 			packageName + ' ' + packageName + '/root_password password ' + self.defaultRootPass,
 			packageName + ' ' + packageName + '/root_password_again password ' + self.defaultRootPass
 		])
-		self.curDist.execMethod(package['name'] + 'Setup', self, package)
+		self.curDist.execPackageMethod('install', self, package)
 		self.curDist.aptGet(packageName)
 
 	def deleteUbuntu(self):
@@ -48,19 +50,18 @@ class Mysql:
 		return (Helper()).checkVersion(self.serverName)
 
 	def getPackage(self):
-		key = self.attrs['build'] if 'build' in self.attrs and self.attrs['build'] in self.packages else 'mysql'
-		return (Helper()).mergeDicts(self.packages[key], {'name': key}) if type(self.packages[key]) is dict else self.packages[key]
+		return (Helper()).getPackageInfo('build', self.attrs, self.packages, self.defaultPackage)
 
 	def getPackageName(self):
 		package = self.getPackage()
 		return package['service_name'] if type(package) is dict else package
 
-	# builds setups
-	def perconaSetup(self, data):
+	# packages installs
+	def perconaInstall(self, data):
 		helper = Helper()
-		helper.wgetDpkg(data['download_url'].replace('{$lsb_release}', helper.getLsbRelease()))
+		helper.wgetDpkg(helper.getLsbRelease(data['download_url']))
 		self.curDist.aptGetUpdate()
 		helper.debConfSetSelections(data['deb_conf'])
 
-	def mariadbSetup(self, data):
+	def mariadbInstall(self, data):
 		(Helper()).debConfSetSelections(data['deb_conf'])

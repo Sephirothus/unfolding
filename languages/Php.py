@@ -7,40 +7,80 @@ class Php:
 
 	name = "PHP"
 	sortOrder = ["databases"]
+
+	serverName = 'php'
+	defaultModules = ['mcrypt', 'curl', 'gd', 'intl', 'json']
+	defaultPackage = '5.6'
+	packages = {
+		'5.4': {
+			'methodPrefix': 'php',
+			'command': 'php5',
+			'rep': 'ppa:ondrej/php5-oldstable'
+		},
+		'5.5': {
+			'methodPrefix': 'php',
+			'command': 'php5',
+			'rep': 'ppa:ondrej/php5'
+		},
+		'5.6': {
+			'methodPrefix': 'php',
+			'command': 'php5',
+			'rep': 'ppa:ondrej/php5-5.6'
+		},
+		'7.0': {
+			'methodPrefix': 'php',
+			'command': 'php7.0',
+			'rep': 'ppa:ondrej/php',
+		},
+		'hhvm': {
+			'command': 'hhvm',
+			'key': '--recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0x5a16e7281be7a449',
+			'rep': 'deb http://dl.hhvm.com/ubuntu {$lsb_release} main',
+		}
+	}
 	
 	def installUbuntu(self):
-		command = self.getCommandName()
-		self.curDist.aptGet(command['command'], command['rep'], command['key'], command['version'])
-		if command['isFpm']: self.curDist.aptGet(command['command'] + '-fpm')
+		self.curDist.execPackageMethod('install', self, self.getPackage())
 
 	def configureUbuntu(self):
-		command = self.getCommandName()['command']
-		if (command == 'hhvm'):
-			self.curDist.execute('/usr/share/hhvm/install_fastcgi.sh')
-		else:
-			modules = self.getModules()
-			if (modules):
-				print "-- installing " + modules
-				print self.curDist.aptGet(modules)
+		self.curDist.execPackageMethod('configure', self, self.getPackage())
 
 	def check(self):
-		return (Helper()).checkVersion('php')
+		return (Helper()).checkVersion(self.serverName)
 
 	def deleteUbuntu(self):
-		command = self.getCommandName()
-		if command['command'] == 'hhvm': 
-			self.curDist.execute('/usr/share/hhvm/uninstall_fastcgi.sh')
-			(Apache()).restart()
-			(Nginx()).restart()
-		self.curDist.removeAptGet(command['command'] + '*', command['rep'])
+		package = self.getPackage()
+		self.curDist.execPackageMethod('delete', self, package)
+		self.curDist.removeAptGet(package['command'] + '*', package['rep'])
+
+	def getPackage(self):
+		return (Helper()).getPackageInfo('version', self.attrs, self.packages, self.defaultPackage)
+
+	# packages installs
+	def hhvmInstall(self, data):
+		self.curDist.aptGet(data['command'], data['rep'], (Helper()).getLsbRelease(data['key']))
+
+	def phpInstall(self, data):
+		self.curDist.aptGet(data['command'], data['rep'], False, data['index'])
+		if 'is_fpm' in self.attrs: self.curDist.aptGet(data['command'] + '-fpm')
+
+	# packages configure
+	def hhvmConfigure(self, data):
+		self.curDist.execute('/usr/share/hhvm/install_fastcgi.sh')
+
+	def phpConfigure(self, data):
+		modules = self.getModules()
+		if (modules):
+			print "-- installing " + modules
+			print self.curDist.aptGet(modules)
 
 	def getModules(self):
 		modules = False
 		if 'modules' in self.attrs:
-			command = self.getCommandName()['command']
+			command = self.getPackage()['command']
 			modules = self.attrs['modules']
 			if modules == 'default':
-				modules = ['mcrypt', 'curl', 'gd', 'intl', 'json']
+				modules = self.defaultModules
 
 				# checking if dbs installed, then install extensions for them
 				if (Mysql()).check():
@@ -49,31 +89,8 @@ class Php:
 			modules = ' '.join([command + '-' + mod for mod in modules])
 		return modules
 
-	def getCommandName(self):
-		rep = False
-		command = 'php5'
-		version = False
-		isFpm = False
-		key = False
-		if hasattr(self, 'attrs'):
-			if 'version' in self.attrs:
-				version = self.attrs['version']
-				if version == '5.4':
-					rep = 'ppa:ondrej/php5-oldstable'
-				elif version == '5.5':
-					rep = 'ppa:ondrej/php5'
-				elif version == '5.6':
-					rep = 'ppa:ondrej/php5-5.6'
-				elif version == '7.0':
-					rep = 'ppa:ondrej/php'
-					command = 'php7.0'
-					version = False
-				elif version == 'hhvm':
-					key = '--recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0x5a16e7281be7a449'
-					rep = 'deb http://dl.hhvm.com/ubuntu ' + (Helper()).getLsbRelease() + ' main'
-					command = 'hhvm'
-					version = False
-			if 'is_fpm' in self.attrs and ('version' not in self.attrs or self.attrs['version'] != 'hhvm'):
-				isFpm = self.attrs['is_fpm']
-
-		return {'command': command, 'rep': rep, 'isFpm': isFpm, 'version': version, 'key': key}
+	# packages delete
+	def hhvmDelete(self, data):
+		self.curDist.execute('/usr/share/hhvm/uninstall_fastcgi.sh')
+		(Apache()).restart()
+		(Nginx()).restart()

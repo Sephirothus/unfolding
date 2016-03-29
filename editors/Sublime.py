@@ -4,21 +4,26 @@ class Sublime:
 
 	name = "Sublime Text"
 
-	mainFolder = ''
-	installedPackagesFolder = ''
-	packagesFolder = ''
+	mainFolder = '{$home_folder}.config/sublime-text-{$version}/'
+	installedPackagesFolder = '{$main_folder}Installed\ Packages/'
+	packagesFolder = '{$main_folder}Packages/'
+	userSettingsFolder = '{$main_folder}Packages/User/'
+
+	defaultPackage = '3'
+	packages = {
+		'2': {
+			'command': 'sublime-text',
+			'rep': 'ppa:webupd8team/sublime-text-2'
+		},
+		'3': {
+			'command': 'sublime-text-installer',
+			'rep': 'ppa:webupd8team/sublime-text-3'
+		}
+	}
 	
 	def installUbuntu(self):
-		command = 'sublime-text-installer'
-		rep = 'ppa:webupd8team/sublime-text-3'
-		if hasattr(self, 'attrs'):
-			if 'version' in self.attrs:
-				version = self.attrs['version']
-				if version == '2':
-					command = 'sublime-text'
-					rep = 'ppa:webupd8team/sublime-text-2'
-
-		self.curDist.aptGet(command, rep)
+		package = self.curDist.getPackageInfo('version', self.attrs, self.packages, self.defaultPackage)
+		self.curDist.aptGet(package['command'], package['rep'])
 
 	def configure(self):
 		self.setPaths()
@@ -44,13 +49,16 @@ class Sublime:
 		# add packages https://mattstauffer.co/blog/sublime-text-3-for-php-developers
 
 	def checkUbuntu(self):
-		return self.curDist.checkAptGet('sublime-text-installer') or self.curDist.checkAptGet('sublime-text')
+		for pack in self.packages:
+			if self.curDist.checkAptGet(pack['command']): return True
+		return False
 
 	def setPaths(self):
-		helper = Helper()
-		self.mainFolder = helper.homeFolder() + '.config/sublime-text-' + (self.attrs['version'] if 'version' in self.attrs else '3') + '/'
-		self.installedPackagesFolder = self.mainFolder + 'Installed\ Packages/'
-		self.packagesFolder = self.mainFolder + 'Packages/'
+		self.mainFolder = self.mainFolder.replace('{$home_folder}', (Helper()).homeFolder())
+		self.mainFolder = self.mainFolder.replace('{$version}', self.attrs['version'] if 'version' in self.attrs else self.defaultPackage)
+		self.installedPackagesFolder = self.installedPackagesFolder.replace('{$main_folder}', self.mainFolder)
+		self.packagesFolder = self.packagesFolder.replace('{$main_folder}', self.mainFolder)
+		self.userSettingsFolder = self.userSettingsFolder.replace('{$main_folder}', self.mainFolder)
 
 	def installPackage(self, packageUrl, packageType='packages'):
 		helper = Helper()
@@ -59,9 +67,9 @@ class Sublime:
 		if not helper.checkFile(filePath): helper.wgetUnpack(packageUrl, folder)
 
 	def setSettings(self, fileName, fileContent):
-		helper = Helper()
-		helper.fileActions(self.mainFolder + 'Packages/User/' + fileName, 'a', fileContent)
+		(Helper()).fileActions(self.userSettingsFolder + fileName, 'a', fileContent)
 
+	# sublime packages list
 	def getPackages(self):
 		return {
 			'Package Control': 'https://packagecontrol.io/Package%20Control.sublime-package',

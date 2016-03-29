@@ -161,8 +161,11 @@ class Helper:
 		if type(params) != str: params = '\n'.join(params)
 		self.execute('echo "' + params + '" | sudo debconf-set-selections', True)
 
-	def getLsbRelease(self):
-		return self.execute('lsb_release -sc').strip()
+	def getLsbRelease(self, path = False):
+		lsbRelease = self.execute('lsb_release -sc').strip()
+		if path: 
+			lsbRelease = path.replace('{$lsb_release}', lsbRelease)
+		return lsbRelease
 
 	def checkVersion(self, service, versCom = '--version'):
 		try:
@@ -226,3 +229,12 @@ class Helper:
 		for key, val in enumerate(hosts):
 			hosts[key] = '127.0.0.1	' + val
 		self.removeHost(hosts)
+
+	# package actions
+	def getPackageInfo(self, field, attrs, packages, defaultPack):
+		key = attrs[field] if field in attrs and attrs[field] in packages else defaultPack
+		return self.mergeDicts(packages[key], {'index': key}) if type(packages[key]) is dict else packages[key]
+
+	def execPackageMethod(self, method, obj, params):
+		method = (params['methodPrefix'] if 'methodPrefix' in params else params['index']) + self.ucfirst(method)
+		self.execMethod(method, self, package)
