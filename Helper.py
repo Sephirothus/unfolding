@@ -237,4 +237,4 @@ class Helper:
 
 	def execPackageMethod(self, method, obj, params):
 		method = (params['methodPrefix'] if 'methodPrefix' in params else params['index']) + self.ucfirst(method)
-		self.execMethod(method, self, package)
+		return self.execMethod(method, self, package)

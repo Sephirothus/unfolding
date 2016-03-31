@@ -10,66 +10,53 @@ class Yii:
 	sortOrder = ["databases"]
 	name = 'Yii 2.0'
 
-	version = 'basic'
+	composerPath = 'yiisoft/yii2-app-{$version}'
+	defaultPackage = 'basic'
+	driver = 'mysql'
 	folder = '/var/www/yii-application'
 	siteName = 'yii.dev'
 	server = False
-
-	def getAttrs(self):
-		apache = Apache()
-		nginx = Nginx()
-		if 'version' in self.attrs: self.version = self.attrs['version']
-		if 'folder' in self.attrs: self.folder = self.attrs['folder']
-		if 'siteName' in self.attrs: self.siteName = self.attrs['siteName']
-		if apache.check(): 
-			self.server = apache
-		elif nginx.check():
-			self.server = nginx
+	packages = {
+		'basic': {
+			'folders': ['assets/', 'runtime/'],
+			'path': '{$proj_folder}/web',
+			'confFolder': '{$proj_folder}/config/db.php'
+		},
+		'advanced': {
+			'folders': [
+				'backend/assets/', 'backend/runtime/', 'backend/web/assets/', 'frontend/assets/', 
+				'frontend/runtime/', 'frontend/web/assets/', 'console/runtime/'
+			],
+			'path': {'admin' : '{$proj_folder}/backend/web', '': '{$proj_folder}/frontend/web'},
+			'confFile': '{$proj_folder}/common/config/main-local.php'
+		}
+	}
 
 	def install(self):
 		helper = Helper()
-		self.getAttrs()
-		helper.composerProject('yiisoft/yii2-app-' + self.version + ' ' + self.folder)
+		package = self.getPackage()
+		helper.composerProject(self.composerPath.replace('{$version}', package['index']) + ' ' + self.folder)
+		helper.execPackageMethod('install', self, package)
 		# https://github.com/yiisoft/yii2/releases/download/2.0.6/yii-' + self.version + '-app-2.0.6.tgz
-		if self.version == 'advanced':
-			helper.execute('sudo php ' + self.folder + '/init --env="Development"')
 			
 	def configure(self):
 		helper = Helper()
-		self.getAttrs()
+		package = self.getPackage()
 
 		print "-- Set chmod to runtime and assets"
-		if self.version == 'advanced':
-			helper.setChmod(['backend/assets/', 'backend/runtime/', 'backend/web/assets/', 'frontend/assets/', 'frontend/runtime/', 'frontend/web/assets/', 'console/runtime/'], self.folder)
-		else:
-			helper.setChmod(['assets/', 'runtime/'], self.folder)
+		helper.setChmod(package['folders'], self.folder)
 
-		if self.version == 'advanced': path = {'admin' : self.folder + '/backend/web', '': self.folder + '/frontend/web'}
-		else: path = self.folder + '/web'
 		if self.server:
 			print "-- Creating " + self.server.name + " config"
-			helper.serverAddSite(self.server, self.siteName, path)
+			helper.serverAddSite(self.server, self.siteName, package['path'])
 
 		if all (k in self.attrs for k in ['db', 'user', 'password']):
-			if 'driver' in self.attrs:
-				driver = self.attrs['driver']
-			elif (Mysql()).check():
-				driver = 'mysql'
-
-			if self.version == 'advanced':
-				print "-- Rewriting main-local config"
-				dbFile = self.folder + '/common/config/main-local.php'
-				dbConf = self.customConfFile(self.attrs['db'], self.attrs['user'], self.attrs['password'], driver)
-			else:
-				print "-- Rewriting db config"
-				dbFile = self.folder + '/config/db.php'
-				dbConf = '<?php\n return [\n' + self.customDbFile(self.attrs['db'], self.attrs['user'], self.attrs['password'], driver) + '];'
-
-			helper.saveFile(dbFile, dbConf)
+			dbConf = self.curDist.execPackageMethod('getConf', self, package)
+			helper.saveFile(package['confFile'], dbConf)
 
 	def delete(self):
 		helper = Helper()
-		self.getAttrs()
+		package = self.getPackage()
 		hosts = ['admin.' + self.siteName, self.siteName]
 		print "-- Remove site folder"
 		helper.rm(self.folder)
@@ -77,6 +64,36 @@ class Yii:
 		if self.server:
 			print "-- Remove " + self.server.name + " config"
 			helper.serverRemoveSite(self.server, self.siteName, hosts)
+
+	def getPackage(self):
+		apache = Apache()
+		nginx = Nginx()
+		package = (Helper()).getPackageInfo('version', self.attrs, self.packages, self.defaultPackage)
+		if 'folder' in self.attrs: self.folder = self.attrs['folder']
+		if 'siteName' in self.attrs: self.siteName = self.attrs['siteName']
+		if 'driver' in self.attrs: self.driver = self.attrs['driver']
+		if apache.check(): 
+			self.server = apache
+		elif nginx.check():
+			self.server = nginx
+		package['confFile'] = package['confFile'].replace('{$proj_folder}', self.folder)
+		if type(package['path']) is dict:
+			for key, val in package['path'].iteritems():
+				package['path'][key] = package['path'][key].replace('{$proj_folder}', self.folder)
+		else:
+			package['path'] = package['path'].replace('{$proj_folder}', self.folder)
+		return package
+
+	def advancedInstall(self, data):
+		(Helper()).execute('sudo php ' + self.folder + '/init --env="Development"')
+
+	def basicGetConf(self, data):
+		print "-- Rewriting db config"
+		return '<?php\n return [\n' + self.customDbFile(self.attrs['db'], self.attrs['user'], self.attrs['password'], driver) + '];'
+
+	def advancedGetConf(self, data):
+		print "-- Rewriting main-local config"
+		return self.customConfFile(self.attrs['db'], self.attrs['user'], self.attrs['password'], driver)
 
 	def customDbFile(self, db, user, password, driver='mysql'):
 		return "\

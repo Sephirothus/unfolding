@@ -49,8 +49,8 @@ class Sublime:
 		# add packages https://mattstauffer.co/blog/sublime-text-3-for-php-developers
 
 	def checkUbuntu(self):
-		for pack in self.packages:
-			if self.curDist.checkAptGet(pack['command']): return True
+		for key, val in self.packages.iteritems():
+			if self.curDist.checkAptGet(val['command']): return True
 		return False
 
 	def setPaths(self):
