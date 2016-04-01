@@ -3,8 +3,15 @@ import subprocess, shlex, socket, os.path, inspect
 
 class Helper:
 
-	supportedDists = ['ubuntu', 'opensuse', 'fedora', 'linuxmint', 'debian', 'gentoo', 'archlinux', 'centos', 'mageia']
+	# 'ubuntu', 'linuxmint', 'debian' - apt-get
+	# 'opensuse' - zypper
+	# 'fedora', 'centos' - yum
+	# 'gentoo' - emerge
+	# 'archlinux' - pacman
+	# 'mageia' - urpmi
+	supportedDists = ['ubuntu', 'linuxmint', 'debian', 'opensuse', 'fedora', 'gentoo', 'archlinux', 'centos', 'mageia']
 	logFileName = 'commands.log'
+	localhost = '127.0.0.1'
 
 	def execute(self, command, withShell=False):
 		rawCommand = command
@@ -200,10 +207,10 @@ class Helper:
 			for alias, path in folder.iteritems():
 				site = alias + '.' + siteName if alias else siteName
 				config += server.siteConf(site, path) + "\n\n"
-				host += '127.0.0.1	' + site + "\n"
+				host += self.localhost + '	' + site + "\n"
 		else:
 			config = server.siteConf(siteName, folder)
-			host = '127.0.0.1	' + siteName
+			host = self.localhost + '	' + siteName
 
 		siteName += '.conf'
 		path = server.path + siteName
@@ -227,7 +234,7 @@ class Helper:
 		server.restart()
 		print "-- Remove hosts"
 		for key, val in enumerate(hosts):
-			hosts[key] = '127.0.0.1	' + val
+			hosts[key] = self.localhost + '	' + val
 		self.removeHost(hosts)
 
 	# package actions

@@ -38,5 +38,14 @@ class Ubuntu(Helper):
 	def getCandidateVersion(self, package):
 		return re.search('Candidate:\s(\S+)', self.aptCachePolicy(package)).group(0)
 
+	def servCom(self, service, command):
+		return self.execute('sudo service ' + service + ' ' + command)
+
 	def servStatus(self, service):
-		return self.execute('sudo service ' + service + ' status')
+		return self.servCom(service, 'status')
+
+	def servStop(self, service):
+		return self.servCom(service, 'stop')
+
+	def servStart(self, service):
+		return self.servCom(service, 'start')

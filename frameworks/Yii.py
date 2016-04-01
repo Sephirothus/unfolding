@@ -76,6 +76,7 @@ class Yii:
 			self.server = apache
 		elif nginx.check():
 			self.server = nginx
+		
 		package['confFile'] = package['confFile'].replace('{$proj_folder}', self.folder)
 		if type(package['path']) is dict:
 			for key, val in package['path'].iteritems():
@@ -89,29 +90,29 @@ class Yii:
 
 	def basicGetConf(self, data):
 		print "-- Rewriting db config"
-		return '<?php\n return [\n' + self.customDbFile(self.attrs['db'], self.attrs['user'], self.attrs['password'], driver) + '];'
+		return '<?php\n return [\n' + self.customDbFile() + '];'
 
 	def advancedGetConf(self, data):
 		print "-- Rewriting main-local config"
-		return self.customConfFile(self.attrs['db'], self.attrs['user'], self.attrs['password'], driver)
+		return self.customConfFile()
 
-	def customDbFile(self, db, user, password, driver='mysql'):
+	def customDbFile(self):
 		return "\
 'class' => 'yii\db\Connection',\n\
-'dsn' => '" + driver + ":host=localhost;dbname=" + db + "',\n\
-'username' => '" + user + "',\n\
-'password' => '" + password + "',\n\
+'dsn' => '" + self.driver + ":host=localhost;dbname=" + self.attrs['db'] + "',\n\
+'username' => '" + self.attrs['user'] + "',\n\
+'password' => '" + self.attrs['password'] + "',\n\
 'charset' => 'utf8',\n\
 'attributes'=>[\n\
 	PDO::ATTR_PERSISTENT => true\n\
 ]\n"
 
-	def customConfFile(self, db, user, password, driver='mysql'):
+	def customConfFile(self):
 		return "<?php\n\
 return [\n\
 	'components' => [\n\
 		'db' => [\n\
-			" + self.customDbFile(db, user, password, driver) + "\
+			" + self.customDbFile() + "\
 		],\n\
 		'mailer' => [\n\
 			'class' => 'yii\swiftmailer\Mailer',\n\
