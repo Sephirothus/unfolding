@@ -1,15 +1,16 @@
 from Helper import Helper
+from dists.RouterDist import RouterDist
 
-class Git:
+class Git(RouterDist):
 
 	name = "Git"
 	serviceName = 'git'
 
 	def installUbuntu(self):
-		print self.curDist.aptGet(self.serviceName)
+		print self.dist.aptGet(self.serviceName)
 
 	def deleteUbuntu(self):
-		return self.curDist.removeAptGet(self.serviceName)
+		return self.dist.removeAptGet(self.serviceName)
 
 	def check(self):
 		return (Helper()).checkVersion(self.serviceName)

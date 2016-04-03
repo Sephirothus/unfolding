@@ -8,7 +8,9 @@ class Ubuntu(Helper):
 	def aptGet(self, package, rep = False, key = False, chosenVersion = False):
 		if rep:
 			# adding key if exists
-			if key: self.execute('sudo apt-key add ' + key)
+			if key: 
+				method = 'add' if self.checkFile(key) else 'adv'
+				self.execute('sudo apt-key ' + method + ' ' + key)
 			# add repository
 			self.execute('sudo add-apt-repository --yes "' + rep + '"')
 			self.aptGetUpdate()

@@ -1,14 +1,15 @@
 from Helper import Helper
+from dists.RouterDist import RouterDist
 
-class Npm:
+class Npm(RouterDist):
 
 	name = 'npm'
 
 	def installUbuntu(self):
-		self.curDist.aptGet(self.name)
+		self.dist.aptGet(self.name)
 
 	def check(self):
 		return (Helper()).checkVersion(self.name)
 
 	def deleteUbuntu(self):
-		self.curDist.removeAptGet(self.name)
+		self.dist.removeAptGet(self.name)

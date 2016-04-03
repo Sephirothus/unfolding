@@ -1,6 +1,7 @@
 from Helper import Helper
+from dists.RouterDist import RouterDist
 
-class Jdk:
+class Jdk(RouterDist):
 
 	name = 'Jdk'
 

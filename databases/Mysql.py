@@ -1,6 +1,7 @@
 from Helper import Helper
+from dists.RouterDist import RouterDist
 
-class Mysql:
+class Mysql(RouterDist):
 
 	name = "MySQL"
 
@@ -8,7 +9,9 @@ class Mysql:
 	defaultRootPass = '1'
 	defaultPackage = 'mysql'
 	packages = {
-		'mysql': 'mysql-server', 
+		'mysql': {
+			'service_name': 'mysql-server'
+		},
 		'mariadb': {
 			'service_name': 'mariadb-server',
 			'deb_conf': 'mariadb-server mariadb-server/oneway_migration	boolean	true'
@@ -22,16 +25,17 @@ class Mysql:
 	
 	def installUbuntu(self):
 		package = self.getPackage()
-		packageName = self.getPackageName()
-		self.curDist.debConfSetSelections([
-			packageName + ' ' + packageName + '/root_password password ' + self.defaultRootPass,
-			packageName + ' ' + packageName + '/root_password_again password ' + self.defaultRootPass
+		self.dist.debConfSetSelections([
+			package['service_name'] + ' ' + package['service_name'] + '/root_password password ' + self.defaultRootPass,
+			package['service_name'] + ' ' + package['service_name'] + '/root_password_again password ' + self.defaultRootPass
 		])
-		self.curDist.execPackageMethod('install', self, package)
-		self.curDist.aptGet(packageName)
+		self.dist.execPackageMethod('install', self, package)
+		self.dist.aptGet(package['service_name'])
 
 	def deleteUbuntu(self):
-		self.curDist.removeAptGet(self.getPackageName())
+		package = self.getPackage()
+		self.dist.execPackageMethod('delete', self, package)
+		self.dist.removeAptGet(package['service_name'])
 		
 	def configure(self):
 		helper = Helper()
@@ -52,16 +56,15 @@ class Mysql:
 	def getPackage(self):
 		return (Helper()).getPackageInfo('build', self.attrs, self.packages, self.defaultPackage)
 
-	def getPackageName(self):
-		package = self.getPackage()
-		return package['service_name'] if type(package) is dict else package
-
 	# packages installs
 	def perconaInstall(self, data):
 		helper = Helper()
 		helper.wgetDpkg(helper.getLsbRelease(data['download_url']))
-		self.curDist.aptGetUpdate()
-		helper.debConfSetSelections(data['deb_conf'])
+		self.dist.aptGetUpdate()
 
 	def mariadbInstall(self, data):
+		(Helper()).debConfSetSelections(data['deb_conf'])
+
+	def perconaDelete(self, data):
+		# delete not works
 		(Helper()).debConfSetSelections(data['deb_conf'])

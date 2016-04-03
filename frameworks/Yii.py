@@ -1,13 +1,14 @@
 from Helper import Helper
+from dists.RouterDist import RouterDist
 
 from servers.Apache import Apache
 from servers.Nginx import Nginx
 from databases.Mysql import Mysql
 
-class Yii:
+class Yii(RouterDist):
 
 	dependencies = ['languages.Php', 'managers.Composer']
-	sortOrder = ["databases"]
+	sortOrder = ["databases", "servers"]
 	name = 'Yii 2.0'
 
 	composerPath = 'yiisoft/yii2-app-{$version}'
@@ -35,9 +36,10 @@ class Yii:
 	def install(self):
 		helper = Helper()
 		package = self.getPackage()
-		helper.composerProject(self.composerPath.replace('{$version}', package['index']) + ' ' + self.folder)
-		helper.execPackageMethod('install', self, package)
-		# https://github.com/yiisoft/yii2/releases/download/2.0.6/yii-' + self.version + '-app-2.0.6.tgz
+		if not helper.isFolderNotEmpty(self.folder) or helper.question("Current folder " + self.folder + " is not empty. Remove it?"):
+			helper.rm(self.folder)
+			helper.composerProject(self.composerPath.replace('{$version}', package['index']) + ' ' + self.folder)
+			helper.execPackageMethod('install', self, package)
 			
 	def configure(self):
 		helper = Helper()
@@ -51,7 +53,7 @@ class Yii:
 			helper.serverAddSite(self.server, self.siteName, package['path'])
 
 		if all (k in self.attrs for k in ['db', 'user', 'password']):
-			dbConf = self.curDist.execPackageMethod('getConf', self, package)
+			dbConf = self.dist.execPackageMethod('getConf', self, package)
 			helper.saveFile(package['confFile'], dbConf)
 
 	def delete(self):

@@ -1,6 +1,7 @@
 from Helper import Helper
+from dists.RouterDist import RouterDist
 
-class Apache:
+class Apache(RouterDist):
 
 	name = "Apache"
 	serviceName = 'apache2'
@@ -8,13 +9,13 @@ class Apache:
 	commandName = 'apache2ctl'
 
 	def installUbuntu(self):
-		self.curDist.aptGet(self.serviceName)
+		self.dist.aptGet(self.serviceName)
 
 	def check(self):
 		return (Helper()).checkVersion(self.commandName)
 
 	def deleteUbuntu(self):
-		self.curDist.removeAptGet(self.serviceName)
+		self.dist.removeAptGet(self.serviceName)
 
 	def restart(self):
 		(Helper()).execute('sudo /etc/init.d/' + self.serviceName + ' restart')

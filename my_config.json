@@ -3,11 +3,17 @@
         "mysql": {
             "db": "padm_test",
             "user": "padm_user",
-            "password": "1"
+            "password": "1",
+            "build": "percona"
+        },
+        "mongo": {}
+    },
+    "languages": {
+        "php": {
+            "version": "hhvm"
         }
     },
-    "languages": "php",
-    "servers": "apache",
+    "servers": ["apache", "nginx"],
     "frameworks": {
         "yii": {
             "version": "advanced",

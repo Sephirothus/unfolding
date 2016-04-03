@@ -1,6 +1,7 @@
 from Helper import Helper
+from dists.RouterDist import RouterDist
 
-class Nginx:
+class Nginx(RouterDist):
 
 	name = 'Nginx'
 	serviceName = 'nginx'
@@ -9,13 +10,13 @@ class Nginx:
 	pathEnabled = '/etc/nginx/sites-enabled/'
 
 	def installUbuntu(self):
-		self.curDist.aptGet(self.serviceName)
+		self.dist.aptGet(self.serviceName)
 
 	def check(self):
 		return (Helper()).checkVersion(self.serviceName, '-v')
 
 	def deleteUbuntu(self):
-		self.curDist.removeAptGet(self.serviceName)
+		self.dist.removeAptGet(self.serviceName)
 
 	def restart(self):
 		(Helper()).execute('sudo /etc/init.d/' + self.serviceName + ' restart')

@@ -1,16 +1,17 @@
 from Helper import Helper
+from dists.RouterDist import RouterDist
 
-class Sphinx:
+class Sphinx(RouterDist):
 
 	name = "Sphinx"
 	serviceName = 'sphinxsearch'
 	serverName = 'searchd'
 	
 	def installUbuntu(self):
-		self.curDist.aptGet(self.serviceName)
+		self.dist.aptGet(self.serviceName)
 
 	def deleteUbuntu(self):
-		self.curDist.removeAptGet(self.serviceName)
+		self.dist.removeAptGet(self.serviceName)
 
 	def check(self):
 		return (Helper()).checkVersion(self.serverName)

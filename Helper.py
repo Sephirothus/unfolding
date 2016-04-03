@@ -3,15 +3,9 @@ import subprocess, shlex, socket, os.path, inspect
 
 class Helper:
 
-	# 'ubuntu', 'linuxmint', 'debian' - apt-get
-	# 'opensuse' - zypper
-	# 'fedora', 'centos' - yum
-	# 'gentoo' - emerge
-	# 'archlinux' - pacman
-	# 'mageia' - urpmi
-	supportedDists = ['ubuntu', 'linuxmint', 'debian', 'opensuse', 'fedora', 'gentoo', 'archlinux', 'centos', 'mageia']
 	logFileName = 'commands.log'
 	localhost = '127.0.0.1'
+	hostsFolder = '/etc/hosts'
 
 	def execute(self, command, withShell=False):
 		rawCommand = command
@@ -21,6 +15,10 @@ class Helper:
 		# log command and it's output
 		self.fileActions(self.logFileName, 'a', '>>>>> ' + rawCommand + "\n" + output)
 		return output
+
+	def question(self, question):
+		isOk = raw_input(question + " ").lower()
+		return isOk[0] == 'y'
 	
 	def getClass(self, moduleName):
 		className = moduleName.rsplit(".", 1)[1]
@@ -39,14 +37,21 @@ class Helper:
 			self.listAdd(val, data)
 
 	def listFind(self, val, data):
+		ret = []
 		className = val.split('.')
 		for i in data:
 			if len(className) == 1:
 				folder = inspect.getfile(i.__class__).split('/')[-2]
 				if folder == className[0]:
-					return i
+					ret.append(i)
 			elif len(className) == 2 and i.__class__.__name__ == className[1]:
-				return i
+				ret.append(i)
+		return ret
+
+	def listFindAndAdd(self, findEl, findList, newList):
+		foundVals = self.listFind(findEl, findList)
+		for foundVal in foundVals:
+			self.listAdd(foundVal, newList)
 
 	def mergeDicts(self, first, second):
 		data = first.copy()
@@ -55,19 +60,6 @@ class Helper:
 
 	def ucfirst(self, string):
 		return string[0].upper() + string[1:]
-
-	def getDist(self, conf=False, onlyName=False):
-		distName = ''
-		if 'dists' in conf:
-			distName = conf['dists']
-		else:
-			grep = self.execute("cat /etc/os-release")
-			distName = grep.split('\n')[0].split('=')[1].strip('"')
-
-		if (distName.lower() not in self.supportedDists): raise Exception('Unknown or unsupported linux distributive')
-		
-		distName = self.ucfirst(distName.lower())
-		return distName if onlyName else self.getClass('dists.' + distName)()
 
 	def hostName(self):
 		return socket.gethostname()
@@ -125,10 +117,10 @@ class Helper:
 		fileData.close()
 
 	def addHost(self, host):
-		self.fileActions('/etc/hosts', 'a', '\n' + host)
+		self.fileActions(self.hostsFolder, 'a', '\n' + host)
 
 	def removeHost(self, hosts):
-		self.editFile('/etc/hosts', {i: '' for i in hosts})
+		self.editFile(self.hostsFolder, {i: '' for i in hosts})
 
 	def saveFile(self, filePath, content):
 		self.fileActions(filePath, 'w', content)
@@ -144,6 +136,9 @@ class Helper:
 	def checkFile(self, fileName):
 		return os.path.isfile(fileName)
 
+	def isFolderNotEmpty(self, folder):
+		return os.path.isdir(folder) and os.listdir(folder)
+
 	def composerProject(self, params):
 		return self.execute('sudo composer create-project --prefer-dist ' + params)
 
@@ -153,7 +148,7 @@ class Helper:
 	def postgreCommand(self, command, user='postgres', password='postgres'):
 		return self.execute('psql -U ' + user + (' -W' + password if password else '') + ' -c "' + command + ';"')
 
-	def setChmod(self, files, folder=''):
+	def setChmod(self, files, folder='', rights='777'):
 		if folder: folder += '/'
 		paths = ''
 		if type(files) is list:
@@ -162,7 +157,7 @@ class Helper:
 		else:
 			paths += folder + files
 
-		return self.execute('sudo chmod -R 777 ' + paths)
+		return self.execute('sudo chmod -R ' + rights + ' ' + paths)
 
 	def debConfSetSelections(self, params):
 		if type(params) != str: params = '\n'.join(params)
@@ -181,10 +176,9 @@ class Helper:
 		except OSError:
 			return False
 
-	def getMethod(self, method, obj, distName=False):
+	def getMethod(self, method, obj):
 		methodName = False
-		if not distName:
-			distName = self.getDist()
+		distName = obj.dist.__class__.__name__
 			
 		if method + distName in dir(obj):
 			methodName = method + distName
@@ -192,6 +186,10 @@ class Helper:
 			methodName = method
 
 		return methodName
+
+	def getAttr(self, attrName, obj):
+		if hasattr(self, attrName): return self.attrName
+		return False
 
 	def execMethod(self, method, obj, params = False):
 		if method in dir(obj):
@@ -240,8 +238,8 @@ class Helper:
 	# package actions
 	def getPackageInfo(self, field, attrs, packages, defaultPack):
 		key = attrs[field] if field in attrs and attrs[field] in packages else defaultPack
-		return self.mergeDicts(packages[key], {'index': key}) if type(packages[key]) is dict else packages[key]
+		return self.mergeDicts(packages[key], {'index': key})
 
 	def execPackageMethod(self, method, obj, params):
 		method = (params['methodPrefix'] if 'methodPrefix' in params else params['index']) + self.ucfirst(method)
-		return self.execMethod(method, self, package)
+		return self.execMethod(method, obj, params)

@@ -4,6 +4,7 @@ import sys, json
 
 from Helper import Helper
 from Config import Config
+from dists.RouterDist import RouterDist
 
 # installs = {
 # 	'apache2 | nginx',
@@ -58,38 +59,41 @@ try:
 		version = ' ' + el.attrs['version'] + ' version' if hasattr(el, 'attrs') and 'version' in el.attrs else ''
 		question.append(str(count) + '. ' + el.name + version)
 		count += 1
-
+	
 	helper.createBlock(question)
-	isOk = raw_input('is it ok? ').lower()
 
-	if isOk[0] == 'y':
-		dist = helper.getDist(conf)
+	if helper.question('is it ok?'):
+		router = RouterDist()
+		dist = router.getDist(conf)
 		distName = dist.__class__.__name__
 		for el in queue:
-			# set current distributive as object parameter
-			el.curDist = dist
+			# set distributive's router with current distributive as an object attribute
+			el.dist = dist
 			helper.createBlock(helper.ucfirst(action) + ' ' + el.name)
-			# checking
-			check = helper.getMethod('check', el, distName)
-			method = helper.getMethod(action, el, distName)
+			if not hasattr(el, 'attrs'): el.attrs = {}
+			# checking package
+			try:
+				checkMethod = helper.getMethod('check', el)
+				check = getattr(el, checkMethod if checkMethod else 'check')()
+			except Exception as e:
+				print str(e)
+				continue
+			# get action method name
+			method = helper.getMethod(action, el)
 			if not method:
 				print "There's no action " + action
 				continue
 
 			if action == 'install':
-				if check and getattr(el, check)(): print el.name + " already installed"
+				if check: print el.name + " already installed"
 				else: getattr(el, method)()
 			else:
-				if not check:
-					print "Cannot check instance, no check method"
-					continue
-				if getattr(el, check)(): getattr(el, method)()
+				if check: getattr(el, method)()
 				else: print el.name + " is not installed"
 
 			if action in ['install', 'update'] and options['-c'] == '1':
 				# configuring
-				if not hasattr(el, 'attrs'): el.attrs = {}
-				configure = helper.getMethod('configure', el, distName)
+				configure = helper.getMethod('configure', el)
 				if configure:
 					print "======= Configuring ======="
 					getattr(el, configure)()
@@ -99,7 +103,7 @@ try:
 		helper.createBlock("As you wish. Thanx for using pAdm:)")
 	
 except Exception as e:
-	print str(e)
+	print "ERROR: " + str(e)
 except KeyboardInterrupt:
 	print "\nBye:)"
 	

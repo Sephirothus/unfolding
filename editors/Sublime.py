@@ -1,6 +1,7 @@
 from Helper import Helper
+from dists.RouterDist import RouterDist
 
-class Sublime:
+class Sublime(RouterDist):
 
 	name = "Sublime Text"
 
@@ -22,8 +23,8 @@ class Sublime:
 	}
 	
 	def installUbuntu(self):
-		package = self.curDist.getPackageInfo('version', self.attrs, self.packages, self.defaultPackage)
-		self.curDist.aptGet(package['command'], package['rep'])
+		package = self.dist.getPackageInfo('version', self.attrs, self.packages, self.defaultPackage)
+		self.dist.aptGet(package['command'], package['rep'])
 
 	def configure(self):
 		self.setPaths()
@@ -50,7 +51,7 @@ class Sublime:
 
 	def checkUbuntu(self):
 		for key, val in self.packages.iteritems():
-			if self.curDist.checkAptGet(val['command']): return True
+			if self.dist.checkAptGet(val['command']): return True
 		return False
 
 	def setPaths(self):

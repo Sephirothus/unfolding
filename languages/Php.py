@@ -1,9 +1,10 @@
+from dists.RouterDist import RouterDist
 from databases.Mysql import Mysql
 from servers.Apache import Apache
 from servers.Nginx import Nginx
 from Helper import Helper
 
-class Php:
+class Php(RouterDist):
 
 	name = "PHP"
 	sortOrder = ["databases"]
@@ -40,39 +41,39 @@ class Php:
 	}
 	
 	def installUbuntu(self):
-		self.curDist.execPackageMethod('install', self, self.getPackage())
+		self.dist.execPackageMethod('install', self, self.getPackage())
 
 	def configureUbuntu(self):
-		self.curDist.execPackageMethod('configure', self, self.getPackage())
+		self.dist.execPackageMethod('configure', self, self.getPackage())
 
 	def check(self):
 		return (Helper()).checkVersion(self.serverName)
 
 	def deleteUbuntu(self):
 		package = self.getPackage()
-		self.curDist.execPackageMethod('delete', self, package)
-		self.curDist.removeAptGet(package['command'] + '*', package['rep'])
+		self.dist.execPackageMethod('delete', self, package)
+		self.dist.removeAptGet(package['command'] + '*', package['rep'])
 
 	def getPackage(self):
 		return (Helper()).getPackageInfo('version', self.attrs, self.packages, self.defaultPackage)
 
 	# packages installs
 	def hhvmInstall(self, data):
-		self.curDist.aptGet(data['command'], data['rep'], (Helper()).getLsbRelease(data['key']))
+		self.dist.aptGet(data['command'], (Helper()).getLsbRelease(data['rep']), data['key'])
 
 	def phpInstall(self, data):
-		self.curDist.aptGet(data['command'], data['rep'], False, data['index'])
-		if 'is_fpm' in self.attrs: self.curDist.aptGet(data['command'] + '-fpm')
+		self.dist.aptGet(data['command'], data['rep'], False, data['index'])
+		if 'is_fpm' in self.attrs: self.dist.aptGet(data['command'] + '-fpm')
 
 	# packages configure
 	def hhvmConfigure(self, data):
-		self.curDist.execute('/usr/share/hhvm/install_fastcgi.sh')
+		self.dist.execute('/usr/share/hhvm/install_fastcgi.sh')
 
 	def phpConfigure(self, data):
 		modules = self.getModules()
 		if (modules):
 			print "-- installing " + modules
-			print self.curDist.aptGet(modules)
+			print self.dist.aptGet(modules)
 
 	def getModules(self):
 		modules = False
@@ -91,6 +92,6 @@ class Php:
 
 	# packages delete
 	def hhvmDelete(self, data):
-		self.curDist.execute('/usr/share/hhvm/uninstall_fastcgi.sh')
+		self.dist.execute('/usr/share/hhvm/uninstall_fastcgi.sh')
 		(Apache()).restart()
 		(Nginx()).restart()

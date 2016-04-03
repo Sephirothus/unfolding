@@ -1,20 +1,21 @@
-from Helper import Helper
+from dists.RouterDist import RouterDist
 
-class Mongo:
+class Mongo(RouterDist):
 
 	name = "MongoDB"
 
 	serviceName = 'mongodb-org'
 	serverName = 'mongodb'
-	key = '--keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927',
+	checkName = 'mongo'
+	key = '--keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927'
 	rep = 'deb http://repo.mongodb.org/apt/ubuntu {$lsb_release}/mongodb-org/3.2 multiverse'
 	dbFolder = '/var/log/mongodb'
 	logsFolder = '/var/lib/mongodb'
 	
 	def installUbuntu(self):
-		self.curDist.aptGet(self.serviceName, self.rep, self.key)
+		self.dist.aptGet(self.serviceName, self.getLsbRelease(self.rep), self.key)
 
 	def deleteUbuntu(self):
-		self.curDist.servStop(self.serverName)
-		self.curDist.removeAptGet(self.serviceName + '*', self.rep)
-		(Helper()).rm(self.dbFolder + ' ' + self.logsFolder)
+		self.dist.servStop(self.serverName)
+		self.dist.removeAptGet(self.serviceName + '*', self.rep)
+		self.rm(self.dbFolder + ' ' + self.logsFolder)

@@ -1,6 +1,7 @@
 from Helper import Helper
+from dists.RouterDist import RouterDist
 
-class Composer:
+class Composer(RouterDist):
 
 	dependencies = ['languages.Php', 'extensions.Curl']
 	name = 'Composer'

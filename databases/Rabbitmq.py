@@ -1,4 +1,6 @@
-class Rabbitmq:
+from dists.RouterDist import RouterDist
+
+class Rabbitmq(RouterDist):
 
 	name = 'RabbitMQ'
 	serviceName = 'rabbitmq-server'
@@ -6,12 +8,12 @@ class Rabbitmq:
 	key = 'http://www.rabbitmq.com/rabbitmq-signing-key-public.asc'
 
 	def installUbuntu(self):
-		key = self.curDist.wget(self.key, '/tmp')
-		self.curDist.aptGet(self.serviceName, self.repository, key)
-		self.curDist.rm(key)
+		key = self.dist.wget(self.key, '/tmp')
+		self.dist.aptGet(self.serviceName, self.repository, key)
+		self.dist.rm(key)
 
 	def checkUbuntu(self):
-		return "Status of node" in self.curDist.servStatus(self.serviceName)
+		return "Status of node" in self.dist.servStatus(self.serviceName)
 
 	def deleteUbuntu(self):
-		self.curDist.removeAptGet(self.serviceName, self.repository)
+		self.dist.removeAptGet(self.serviceName, self.repository)

@@ -1,6 +1,7 @@
 from Helper import Helper
+from dists.RouterDist import RouterDist
 
-class Phpstorm:
+class Phpstorm(RouterDist):
 
 	dependencies = ['extensions.Jdk']
 	name = "PhpStorm"
