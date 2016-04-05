@@ -1,3 +1,4 @@
+import re
 from Helper import Helper
 
 class RouterDist(Helper):
@@ -10,11 +11,18 @@ class RouterDist(Helper):
 	# 'gentoo' - emerge
 	# 'archlinux' - pacman
 	# 'mageia' - urpmi
-	supportedDists = ['ubuntu', 'linuxmint', 'debian', 'opensuse', 'fedora', 'gentoo', 'archlinux', 'centos', 'mageia']
+	supportedDists = {
+		'Debian': ['ubuntu', 'linuxmint', 'debian'],
+		'Redhat': ['fedora', 'centos linux'], 
+		'Archlinux': ['archlinux'],
+		'Gentoo': ['gentoo'],
+		'Opensuse': ['opensuse'],
+		'Mageia': ['mageia']
+	}
 	getOsCommand = "cat /etc/os-release"
 	currentDist = False
 
-	def beforeInstall(self):
+	def beforeInstall(self, package):
 		return False
 
 	def install(self):
@@ -23,14 +31,14 @@ class RouterDist(Helper):
 		self.currentDist.install(package['serviceName'], package['repository'], package['key'])
 		self.afterInstall(package)
 
-	def afterInstall(self):
+	def afterInstall(self, package):
 		return False
 
 	def check(self):
 		if not hasattr(self, 'checkName'): raise Exception('Cannot check instance, no check method')
 		return self.checkVersion(self.checkName)
 
-	def beforeDelete(self):
+	def beforeDelete(self, package):
 		return False
 
 	def delete(self):
@@ -41,7 +49,7 @@ class RouterDist(Helper):
 		self.afterDelete(package)
 		return False
 
-	def afterDelete(self):
+	def afterDelete(self, package):
 		return False
 
 	def getDist(self, conf = False):
@@ -49,13 +57,15 @@ class RouterDist(Helper):
 		if 'dists' in conf:
 			distName = conf['dists']
 		else:
-			grep = self.execute(self.getOsCommand)
-			distName = grep.split('\n')[0].split('=')[1].strip('"')
+			distName = re.search('ID=(\S+)', self.execute(self.getOsCommand)).group(1).strip('"')
 
-		if (distName.lower() not in self.supportedDists): raise Exception('Unknown or unsupported linux distributive')
+		distGroup = False
+		for key, dist in self.supportedDists.iteritems(): 
+			if distName.lower() in dist: distGroup = key
+
+		if not distGroup: raise Exception('Unknown or unsupported linux distribution')
 		
-		distName = self.ucfirst(distName.lower())
-		self.currentDist = self.getClass('dists.' + distName)()
+		self.currentDist = self.getClass('dists.' + distGroup)()
 		return self.currentDist
 
 	def __getPackage(self):
@@ -63,4 +73,5 @@ class RouterDist(Helper):
 			package = self.getPackageInfo(self.packageAttr, self.attrs, self.packages, self.defaultPackage)
 		else:
 			package = self.getAttr(['serviceName', 'repository', 'key'], self)
+		package['repository'] = self.getLsbRelease(package['repository'])
 		return package

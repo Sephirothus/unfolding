@@ -6,10 +6,10 @@ class Npm(RouterDist):
 	name = 'npm'
 
 	def installUbuntu(self):
-		self.dist.aptGet(self.name)
+		self.currentDist.aptGet(self.name)
 
 	def check(self):
 		return (Helper()).checkVersion(self.name)
 
 	def deleteUbuntu(self):
-		self.dist.removeAptGet(self.name)
+		self.currentDist.removeAptGet(self.name)

@@ -67,8 +67,8 @@ try:
 		dist = router.getDist(conf)
 		distName = dist.__class__.__name__
 		for el in queue:
-			# set distributive's router with current distributive as an object attribute
-			el.dist = dist
+			# set current distribution as an object attribute
+			el.currentDist = dist
 			helper.createBlock(helper.ucfirst(action) + ' ' + el.name)
 			if not hasattr(el, 'attrs'): el.attrs = {}
 			# checking package
@@ -102,8 +102,8 @@ try:
 	else:
 		helper.createBlock("As you wish. Thanx for using pAdm:)")
 	
-except Exception as e:
-	print "ERROR: " + str(e)
+# except Exception as e:
+# 	print "ERROR: " + str(e)
 except KeyboardInterrupt:
 	print "\nBye:)"
 	

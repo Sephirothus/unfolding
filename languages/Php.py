@@ -41,39 +41,39 @@ class Php(RouterDist):
 	}
 	
 	def installUbuntu(self):
-		self.dist.execPackageMethod('install', self, self.getPackage())
+		self.currentDist.execPackageMethod('install', self, self.getPackage())
 
 	def configureUbuntu(self):
-		self.dist.execPackageMethod('configure', self, self.getPackage())
+		self.currentDist.execPackageMethod('configure', self, self.getPackage())
 
 	def check(self):
 		return (Helper()).checkVersion(self.serverName)
 
 	def deleteUbuntu(self):
 		package = self.getPackage()
-		self.dist.execPackageMethod('delete', self, package)
-		self.dist.removeAptGet(package['command'] + '*', package['rep'])
+		self.currentDist.execPackageMethod('delete', self, package)
+		self.currentDist.removeAptGet(package['command'] + '*', package['rep'])
 
 	def getPackage(self):
 		return (Helper()).getPackageInfo('version', self.attrs, self.packages, self.defaultPackage)
 
 	# packages installs
 	def hhvmInstall(self, data):
-		self.dist.aptGet(data['command'], (Helper()).getLsbRelease(data['rep']), data['key'])
+		self.currentDist.aptGet(data['command'], (Helper()).getLsbRelease(data['rep']), data['key'])
 
 	def phpInstall(self, data):
-		self.dist.aptGet(data['command'], data['rep'], False, data['index'])
-		if 'is_fpm' in self.attrs: self.dist.aptGet(data['command'] + '-fpm')
+		self.currentDist.aptGet(data['command'], data['rep'], False, data['index'])
+		if 'is_fpm' in self.attrs: self.currentDist.aptGet(data['command'] + '-fpm')
 
 	# packages configure
 	def hhvmConfigure(self, data):
-		self.dist.execute('/usr/share/hhvm/install_fastcgi.sh')
+		self.currentDist.execute('/usr/share/hhvm/install_fastcgi.sh')
 
 	def phpConfigure(self, data):
 		modules = self.getModules()
 		if (modules):
 			print "-- installing " + modules
-			print self.dist.aptGet(modules)
+			print self.currentDist.aptGet(modules)
 
 	def getModules(self):
 		modules = False
@@ -92,6 +92,6 @@ class Php(RouterDist):
 
 	# packages delete
 	def hhvmDelete(self, data):
-		self.dist.execute('/usr/share/hhvm/uninstall_fastcgi.sh')
+		self.currentDist.execute('/usr/share/hhvm/uninstall_fastcgi.sh')
 		(Apache()).restart()
 		(Nginx()).restart()

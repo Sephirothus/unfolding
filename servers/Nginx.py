@@ -10,13 +10,13 @@ class Nginx(RouterDist):
 	pathEnabled = '/etc/nginx/sites-enabled/'
 
 	def installUbuntu(self):
-		self.dist.aptGet(self.serviceName)
+		self.currentDist.aptGet(self.serviceName)
 
 	def check(self):
 		return (Helper()).checkVersion(self.serviceName, '-v')
 
 	def deleteUbuntu(self):
-		self.dist.removeAptGet(self.serviceName)
+		self.currentDist.removeAptGet(self.serviceName)
 
 	def restart(self):
 		(Helper()).execute('sudo /etc/init.d/' + self.serviceName + ' restart')

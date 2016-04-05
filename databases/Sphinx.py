@@ -8,10 +8,10 @@ class Sphinx(RouterDist):
 	serverName = 'searchd'
 	
 	def installUbuntu(self):
-		self.dist.aptGet(self.serviceName)
+		self.currentDist.aptGet(self.serviceName)
 
 	def deleteUbuntu(self):
-		self.dist.removeAptGet(self.serviceName)
+		self.currentDist.removeAptGet(self.serviceName)
 
 	def check(self):
 		return (Helper()).checkVersion(self.serverName)

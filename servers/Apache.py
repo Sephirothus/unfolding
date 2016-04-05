@@ -9,13 +9,13 @@ class Apache(RouterDist):
 	commandName = 'apache2ctl'
 
 	def installUbuntu(self):
-		self.dist.aptGet(self.serviceName)
+		self.currentDist.aptGet(self.serviceName)
 
 	def check(self):
 		return (Helper()).checkVersion(self.commandName)
 
 	def deleteUbuntu(self):
-		self.dist.removeAptGet(self.serviceName)
+		self.currentDist.removeAptGet(self.serviceName)
 
 	def restart(self):
 		(Helper()).execute('sudo /etc/init.d/' + self.serviceName + ' restart')

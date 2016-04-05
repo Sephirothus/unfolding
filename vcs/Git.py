@@ -7,10 +7,10 @@ class Git(RouterDist):
 	serviceName = 'git'
 
 	def installUbuntu(self):
-		print self.dist.aptGet(self.serviceName)
+		print self.currentDist.aptGet(self.serviceName)
 
 	def deleteUbuntu(self):
-		return self.dist.removeAptGet(self.serviceName)
+		return self.currentDist.removeAptGet(self.serviceName)
 
 	def check(self):
 		return (Helper()).checkVersion(self.serviceName)

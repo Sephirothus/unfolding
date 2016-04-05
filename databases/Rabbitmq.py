@@ -8,12 +8,12 @@ class Rabbitmq(RouterDist):
 	key = 'http://www.rabbitmq.com/rabbitmq-signing-key-public.asc'
 
 	def installUbuntu(self):
-		key = self.dist.wget(self.key, '/tmp')
-		self.dist.aptGet(self.serviceName, self.repository, key)
-		self.dist.rm(key)
+		key = self.currentDist.wget(self.key, '/tmp')
+		self.currentDist.aptGet(self.serviceName, self.repository, key)
+		self.currentDist.rm(key)
 
 	def checkUbuntu(self):
-		return "Status of node" in self.dist.servStatus(self.serviceName)
+		return "Status of node" in self.currentDist.servStatus(self.serviceName)
 
 	def deleteUbuntu(self):
-		self.dist.removeAptGet(self.serviceName, self.repository)
+		self.currentDist.removeAptGet(self.serviceName, self.repository)

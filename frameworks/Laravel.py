@@ -11,7 +11,7 @@ class Laravel(RouterDist):
 
 	def installUbuntu(self):
 		if hasattr(self, 'attrs') and 'folder' in self.attrs: self.folder = self.attrs['folder']
-		self.dist.composerProject('laravel/laravel ' + self.folder)
+		self.currentDist.composerProject('laravel/laravel ' + self.folder)
 		
 	def configure(self):
 		# TODO db config, apache|nginx config, hosts

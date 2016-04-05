@@ -178,7 +178,7 @@ class Helper:
 
 	def getMethod(self, method, obj):
 		methodName = False
-		distName = obj.dist.__class__.__name__
+		distName = obj.currentDist.__class__.__name__
 			
 		if method + distName in dir(obj):
 			methodName = method + distName
@@ -191,9 +191,9 @@ class Helper:
 		attrs = {}
 		if type(attrNames) is list:
 			for attr in attrNames:
-				if hasattr(obj, attr): attrs[attr] = obj.attr
+				if hasattr(obj, attr): attrs[attr] = getattr(obj, attr)
 		else:
-			if hasattr(obj, attrNames): attrs = obj.attrNames
+			if hasattr(obj, attrNames): attrs = getattr(obj, attrNames)
 		return attrs
 
 	def hasAttr(self, attrNames, obj):

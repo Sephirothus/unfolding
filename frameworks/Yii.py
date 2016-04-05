@@ -53,7 +53,7 @@ class Yii(RouterDist):
 			helper.serverAddSite(self.server, self.siteName, package['path'])
 
 		if all (k in self.attrs for k in ['db', 'user', 'password']):
-			dbConf = self.dist.execPackageMethod('getConf', self, package)
+			dbConf = self.currentDist.execPackageMethod('getConf', self, package)
 			helper.saveFile(package['confFile'], dbConf)
 
 	def delete(self):

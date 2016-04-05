@@ -3,7 +3,7 @@
 import re
 from Helper import Helper
 
-class Ubuntu(Helper):
+class Debian(Helper):
 
 	def install(self, package, rep = False, key = False, chosenVersion = False):
 		if rep:
