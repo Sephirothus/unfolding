@@ -1,13 +1,13 @@
-from Helper import Helper
 from dists.RouterDist import RouterDist
 
 class Mysql(RouterDist):
 
 	name = "MySQL"
 
-	serverName = 'mysql'
+	checkName = 'mysql'
 	defaultRootPass = '1'
 	defaultPackage = 'mysql'
+	packageAttr = 'build'
 	packages = {
 		'mysql': {
 			'service_name': 'mysql-server'
@@ -23,48 +23,36 @@ class Mysql(RouterDist):
 		}
 	}
 	
-	def installUbuntu(self):
-		package = self.getPackage()
-		self.dist.debConfSetSelections([
+	def beforeInstall(self, package):
+		self.debConfSetSelections([
 			package['service_name'] + ' ' + package['service_name'] + '/root_password password ' + self.defaultRootPass,
 			package['service_name'] + ' ' + package['service_name'] + '/root_password_again password ' + self.defaultRootPass
 		])
-		self.dist.execPackageMethod('install', self, package)
-		self.dist.aptGet(package['service_name'])
+		self.execPackageMethod('install', self, package)
 
-	def deleteUbuntu(self):
-		package = self.getPackage()
-		self.dist.execPackageMethod('delete', self, package)
-		self.dist.removeAptGet(package['service_name'])
+	def beforeDelete(self, package):
+		self.execPackageMethod('delete', self, package)
 		
 	def configure(self):
-		helper = Helper()
 		user = 'root'
 		password = self.defaultRootPass
 		if 'user' in self.attrs and 'password' in self.attrs:
 			print "-- Creating user with all privilages"
-			helper.mysqlCommand('GRANT ALL PRIVILEGES ON *.* TO \'' + self.attrs['user'] + '\' IDENTIFIED BY \'' + self.attrs['password'] + '\'', user, password)
+			self.mysqlCommand('GRANT ALL PRIVILEGES ON *.* TO \'' + self.attrs['user'] + '\' IDENTIFIED BY \'' + self.attrs['password'] + '\'', user, password)
 			user = self.attrs['user']
 			password = self.attrs['password']
 		if 'db' in self.attrs:
 			print "-- Creating database"
-			helper.mysqlCommand('CREATE DATABASE IF NOT EXISTS ' + self.attrs['db'], user, password)
-
-	def check(self):
-		return (Helper()).checkVersion(self.serverName)
-
-	def getPackage(self):
-		return (Helper()).getPackageInfo('build', self.attrs, self.packages, self.defaultPackage)
+			self.mysqlCommand('CREATE DATABASE IF NOT EXISTS ' + self.attrs['db'], user, password)
 
 	# packages installs
 	def perconaInstall(self, data):
-		helper = Helper()
-		helper.wgetDpkg(helper.getLsbRelease(data['download_url']))
-		self.dist.aptGetUpdate()
+		self.wgetDpkg(self.getLsbRelease(data['download_url']))
+		self.currentDist.aptGetUpdate()
 
 	def mariadbInstall(self, data):
-		(Helper()).debConfSetSelections(data['deb_conf'])
+		self.debConfSetSelections(data['deb_conf'])
 
 	def perconaDelete(self, data):
 		# delete not works
-		(Helper()).debConfSetSelections(data['deb_conf'])
+		self.debConfSetSelections(data['deb_conf'])

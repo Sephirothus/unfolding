@@ -12,14 +12,16 @@ class RouterDist(Helper):
 	# 'mageia' - urpmi
 	supportedDists = ['ubuntu', 'linuxmint', 'debian', 'opensuse', 'fedora', 'gentoo', 'archlinux', 'centos', 'mageia']
 	getOsCommand = "cat /etc/os-release"
-	current = False
+	currentDist = False
 
 	def beforeInstall(self):
 		return False
 
 	def install(self):
 		package = self.__getPackage()
-		self.current.install(package['serviceName'], package['repository'], package['key'])
+		self.beforeInstall(package)
+		self.currentDist.install(package['serviceName'], package['repository'], package['key'])
+		self.afterInstall(package)
 
 	def afterInstall(self):
 		return False
@@ -32,22 +34,15 @@ class RouterDist(Helper):
 		return False
 
 	def delete(self):
-		#self.current.delete(self.serviceName + '*')
+		# add if not set version, then delete all versions
+		package = self.__getPackage()
+		self.beforeDelete(package)
+		self.currentDist.delete(package['serviceName'] + '*', package['repository'], package['key'])
+		self.afterDelete(package)
 		return False
 
 	def afterDelete(self):
 		return False
-
-	def __getPackage(self):
-		if hasattr(self, 'packageAttr') and hasattr(self, 'defaultPackage'):
-			package = self.getPackageInfo(self.packageAttr, self.attrs, self.packages, self.defaultPackage)
-		else:
-			package = {
-				'serviceName': self.getAttr('serviceName', self),
-				'repository': self.getAttr('repository', self),
-				'key': self.getAttr('key', self),
-			}
-		return package
 
 	def getDist(self, conf = False):
 		distName = ''
@@ -60,5 +55,12 @@ class RouterDist(Helper):
 		if (distName.lower() not in self.supportedDists): raise Exception('Unknown or unsupported linux distributive')
 		
 		distName = self.ucfirst(distName.lower())
-		self.current = self.getClass('dists.' + distName)()
-		return self.current
+		self.currentDist = self.getClass('dists.' + distName)()
+		return self.currentDist
+
+	def __getPackage(self):
+		if self.hasAttr(['packageAttr', 'defaultPackage', 'packages'], self):
+			package = self.getPackageInfo(self.packageAttr, self.attrs, self.packages, self.defaultPackage)
+		else:
+			package = self.getAttr(['serviceName', 'repository', 'key'], self)
+		return package

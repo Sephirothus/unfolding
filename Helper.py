@@ -187,9 +187,22 @@ class Helper:
 
 		return methodName
 
-	def getAttr(self, attrName, obj):
-		if hasattr(self, attrName): return self.attrName
-		return False
+	def getAttr(self, attrNames, obj):
+		attrs = {}
+		if type(attrNames) is list:
+			for attr in attrNames:
+				if hasattr(obj, attr): attrs[attr] = obj.attr
+		else:
+			if hasattr(obj, attrNames): attrs = obj.attrNames
+		return attrs
+
+	def hasAttr(self, attrNames, obj):
+		if type(attrNames) is list:
+			for attr in attrNames:
+				if not hasattr(obj, attr): return False
+		else:
+			if not hasattr(obj, attrNames): return False
+		return True
 
 	def execMethod(self, method, obj, params = False):
 		if method in dir(obj):
