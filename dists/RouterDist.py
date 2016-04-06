@@ -27,9 +27,9 @@ class RouterDist(Helper):
 
 	def install(self):
 		package = self.__getPackage()
-		self.beforeInstall(package)
+		getattr(self, self.getMethod('beforeInstall', self))(package)
 		self.currentDist.install(package['serviceName'], package['repository'], package['key'])
-		self.afterInstall(package)
+		getattr(self, self.getMethod('afterInstall', self))(package)
 
 	def afterInstall(self, package):
 		return False
@@ -42,12 +42,11 @@ class RouterDist(Helper):
 		return False
 
 	def delete(self):
-		# add if not set version, then delete all versions
+		# TODO: add if not set version, then delete all versions
 		package = self.__getPackage()
-		self.beforeDelete(package)
+		getattr(self, self.getMethod('beforeDelete', self))(package)
 		self.currentDist.delete(package['serviceName'] + '*', package['repository'], package['key'])
-		self.afterDelete(package)
-		return False
+		getattr(self, self.getMethod('afterDelete', self))(package)
 
 	def afterDelete(self, package):
 		return False
@@ -73,5 +72,5 @@ class RouterDist(Helper):
 			package = self.getPackageInfo(self.packageAttr, self.attrs, self.packages, self.defaultPackage)
 		else:
 			package = self.getAttr(['serviceName', 'repository', 'key'], self)
-		package['repository'] = self.getLsbRelease(package['repository'])
+		if 'repository' in package: package['repository'] = self.currentDist.getRelease(package['repository'])
 		return package

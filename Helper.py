@@ -163,12 +163,6 @@ class Helper:
 		if type(params) != str: params = '\n'.join(params)
 		self.execute('echo "' + params + '" | sudo debconf-set-selections', True)
 
-	def getLsbRelease(self, path = False):
-		lsbRelease = self.execute('lsb_release -sc').strip()
-		if path: 
-			lsbRelease = path.replace('{$lsb_release}', lsbRelease)
-		return lsbRelease
-
 	def checkVersion(self, service, versCom = '--version'):
 		try:
 			self.execute(service + ' ' + versCom)
@@ -255,4 +249,4 @@ class Helper:
 
 	def execPackageMethod(self, method, obj, params):
 		method = (params['methodPrefix'] if 'methodPrefix' in params else params['index']) + self.ucfirst(method)
-		return self.execMethod(method, obj, params)
+		return self.execMethod(self.getMethod(method, obj), obj, params)

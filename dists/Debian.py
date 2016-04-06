@@ -51,3 +51,9 @@ class Debian(Helper):
 
 	def servStart(self, service):
 		return self.servCom(service, 'start')
+
+	def getRelease(self, path = False):
+		lsbRelease = self.execute('lsb_release -sc').strip()
+		if path: 
+			lsbRelease = path.replace('{$lsb_release}', lsbRelease)
+		return lsbRelease

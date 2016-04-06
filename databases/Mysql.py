@@ -47,7 +47,7 @@ class Mysql(RouterDist):
 
 	# packages installs
 	def perconaInstall(self, data):
-		self.wgetDpkg(self.getLsbRelease(data['download_url']))
+		self.wgetDpkg(self.currentDist.getRelease(data['download_url']))
 		self.currentDist.aptGetUpdate()
 
 	def mariadbInstall(self, data):

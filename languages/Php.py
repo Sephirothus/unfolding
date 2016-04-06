@@ -59,7 +59,7 @@ class Php(RouterDist):
 
 	# packages installs
 	def hhvmInstall(self, data):
-		self.currentDist.aptGet(data['command'], (Helper()).getLsbRelease(data['rep']), data['key'])
+		self.currentDist.aptGet(data['command'], self.currentDist.getRelease(data['rep']), data['key'])
 
 	def phpInstall(self, data):
 		self.currentDist.aptGet(data['command'], data['rep'], False, data['index'])
