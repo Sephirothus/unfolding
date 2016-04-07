@@ -97,14 +97,6 @@ class Helper:
 
 		self.rm('/tmp/' + fileName)
 
-	def dpkg(self, filePath):
-		self.execute('dpkg -i ' + filePath)
-
-	def wgetDpkg(self, filePath):
-		file = self.wget(filePath, '/tmp')
-		self.dpkg(file)
-		self.rm(file)
-
 	def editFile(self, fileName, changes):
 		fileData = open(fileName, "r")
 		newData = fileData.read()

@@ -4,11 +4,15 @@ class Mongo(RouterDist):
 
 	name = "MongoDB"
 
-	serviceName = 'mongodb-org'
-	repository = 'deb http://repo.mongodb.org/apt/ubuntu {$lsb_release}/mongodb-org/3.2 multiverse'
-	key = '--keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927'
 	checkName = 'mongo'
 	serverName = 'mongodb'
+	packages = {
+		'Debian': {
+			'serviceName': 'mongodb-org',
+			'repository': 'deb http://repo.mongodb.org/apt/ubuntu {$lsb_release}/mongodb-org/3.2 multiverse',
+			'key': '--keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927'
+		}
+	}
 	dbFolder = '/var/log/mongodb'
 	logsFolder = '/var/lib/mongodb'
 

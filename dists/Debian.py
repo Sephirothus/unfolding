@@ -57,3 +57,9 @@ class Debian(Helper):
 		if path: 
 			lsbRelease = path.replace('{$lsb_release}', lsbRelease)
 		return lsbRelease
+
+	def wgetAddpkg(self, filePath):
+		filePath = self.wget(filePath, '/tmp')
+		self.execute('dpkg -i ' + filePath)
+		self.rm(filePath)
+		self.aptGetUpdate()

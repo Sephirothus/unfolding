@@ -68,9 +68,15 @@ class RouterDist(Helper):
 		return self.currentDist
 
 	def __getPackage(self):
+		package = {}
+		if hasattr(self, 'packages'):
+			distName = self.currentDist.__class__.__name__
+			package = self.packages[distName] if distName in self.packages else self.packages
+
 		if self.hasAttr(['packageAttr', 'defaultPackage', 'packages'], self):
-			package = self.getPackageInfo(self.packageAttr, self.attrs, self.packages, self.defaultPackage)
-		else:
+			package = self.getPackageInfo(self.packageAttr, self.attrs, package, self.defaultPackage)
+		elif not hasattr(self, 'packages'):
 			package = self.getAttr(['serviceName', 'repository', 'key'], self)
+
 		if 'repository' in package: package['repository'] = self.currentDist.getRelease(package['repository'])
 		return package
