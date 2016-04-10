@@ -82,7 +82,7 @@ class Helper:
 
 	def wget(self, filePath, folder, params=''):
 		fileName = filePath.rsplit('/', 1)[1]
-		self.execute('wget -P ' + folder + ' ' + filePath + ' ' + params)
+		self.execute('wget -q -P ' + folder + ' ' + filePath + ' ' + params)
 		return folder.rstrip('/') + '/' + fileName
 
 	def wgetUnpack(self, filePath, destination='/tmp', params=''):
@@ -177,8 +177,12 @@ class Helper:
 		attrs = {}
 		if type(attrNames) is list:
 			for attr in attrNames:
+				attrs[attr] = False
+				if type(obj) is dict and attr in obj: attrs[attr] = obj[attr]
 				if hasattr(obj, attr): attrs[attr] = getattr(obj, attr)
 		else:
+			attrs = False
+			if type(obj) is dict and attrNames in obj: attrs = obj[attrNames]
 			if hasattr(obj, attrNames): attrs = getattr(obj, attrNames)
 		return attrs
 
@@ -237,8 +241,8 @@ class Helper:
 	# package actions
 	def getPackageInfo(self, field, attrs, packages, defaultPack):
 		key = attrs[field] if field in attrs and attrs[field] in packages else defaultPack
-		return self.mergeDicts(packages[key], {'index': key})
+		return self.mergeDicts(packages[key], {'__index': key})
 
 	def execPackageMethod(self, method, obj, params):
-		method = (params['methodPrefix'] if 'methodPrefix' in params else params['index']) + self.ucfirst(method)
+		method = (params['methodPrefix'] if 'methodPrefix' in params else params['__index']) + self.ucfirst(method)
 		return self.execMethod(self.getMethod(method, obj), obj, params)

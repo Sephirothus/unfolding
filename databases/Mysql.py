@@ -11,24 +11,24 @@ class Mysql(RouterDist):
 	packages = {
 		'Debian': {
 			'mysql': {
-				'service_name': 'mysql-server'
+				'serviceName': 'mysql-server'
 			},
 			'mariadb': {
-				'service_name': 'mariadb-server',
+				'serviceName': 'mariadb-server',
 				'deb_conf': 'mariadb-server mariadb-server/oneway_migration	boolean	true'
 			},
 			'percona': {
-				'service_name': 'percona-server-server',
+				'serviceName': 'percona-server-server',
 				'download_url': 'https://repo.percona.com/apt/percona-release_0.1-3.{$lsb_release}_all.deb',
 				'deb_conf': 'percona-server-server percona-server-server/postrm_remove_databases boolean true'
 			}
 		}
 	}
 	
-	def beforeInstall(self, package):
+	def beforeInstallDebian(self, package):
 		self.debConfSetSelections([
-			package['service_name'] + ' ' + package['service_name'] + '/root_password password ' + self.defaultRootPass,
-			package['service_name'] + ' ' + package['service_name'] + '/root_password_again password ' + self.defaultRootPass
+			package['serviceName'] + ' ' + package['serviceName'] + '/root_password password ' + self.defaultRootPass,
+			package['serviceName'] + ' ' + package['serviceName'] + '/root_password_again password ' + self.defaultRootPass
 		])
 		self.execPackageMethod('install', self, package)
 
@@ -51,9 +51,9 @@ class Mysql(RouterDist):
 	def perconaInstall(self, data):
 		self.wgetAddpkg(self.currentDist.getRelease(data['download_url']))
 
-	def mariadbInstall(self, data):
+	def mariadbInstallDebian(self, data):
 		self.debConfSetSelections(data['deb_conf'])
 
-	def perconaDelete(self, data):
+	def perconaDeleteDebian(self, data):
 		# delete not works
 		self.debConfSetSelections(data['deb_conf'])

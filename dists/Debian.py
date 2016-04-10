@@ -8,9 +8,16 @@ class Debian(Helper):
 	def install(self, package, rep = False, key = False, chosenVersion = False):
 		if rep:
 			# adding key if exists
-			if key: 
-				method = 'add' if self.checkFile(key) else 'adv'
+			if key:
+				# if key is url, we download it
+				checkForUrl = re.search('^http[s]?:\/\/\S+', key)
+				if checkForUrl:
+					key = self.wget(key, '/tmp')
+					method = 'add'
+				else:
+					method = 'adv'
 				self.execute('sudo apt-key ' + method + ' ' + key)
+				if checkForUrl: self.rm(key)
 			# add repository
 			self.execute('sudo add-apt-repository --yes "' + rep + '"')
 			self.aptGetUpdate()

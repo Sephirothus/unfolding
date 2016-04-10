@@ -4,15 +4,14 @@ from dists.RouterDist import RouterDist
 class Sphinx(RouterDist):
 
 	name = "Sphinx"
-	serviceName = 'sphinxsearch'
-	serverName = 'searchd'
-	
-	def installUbuntu(self):
-		self.currentDist.aptGet(self.serviceName)
 
-	def deleteUbuntu(self):
-		self.currentDist.removeAptGet(self.serviceName)
+	checkName = 'searchd'
+	packages = {
+		'Debian': {
+			'serviceName': 'sphinxsearch'
+		}
+	}
 
-	def check(self):
-		return (Helper()).checkVersion(self.serverName)
-		
+	def configure(self):
+		# add config file
+		return False

@@ -73,8 +73,7 @@ try:
 			if not hasattr(el, 'attrs'): el.attrs = {}
 			# checking package
 			try:
-				checkMethod = helper.getMethod('check', el)
-				check = getattr(el, checkMethod if checkMethod else 'check')()
+				check = getattr(el, helper.getMethod('check', el))()
 				# TODO: check if current dist or it's release supports this instance
 				# and if current dist, but not current release supports, ask to install closest instance release
 			except Exception as e:

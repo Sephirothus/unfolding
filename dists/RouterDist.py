@@ -20,6 +20,7 @@ class RouterDist(Helper):
 		'Mageia': ['mageia']
 	}
 	getOsCommand = "cat /etc/os-release"
+	defaultAttrNames = ['serviceName', 'repository', 'key']
 	currentDist = False
 
 	def beforeInstall(self, package):
@@ -42,14 +43,25 @@ class RouterDist(Helper):
 		return False
 
 	def delete(self):
-		# TODO: add if not set version, then delete all versions
-		package = self.__getPackage()
-		getattr(self, self.getMethod('beforeDelete', self))(package)
-		self.currentDist.delete(package['serviceName'] + '*', package['repository'], package['key'])
-		getattr(self, self.getMethod('afterDelete', self))(package)
+		if hasattr(self, 'packageAttr') and self.packageAttr in self.attrs:
+			self.__deleteActions(self.__getPackage())
+		else: 
+			packages = self.__getPackagesForCurDist()
+			if not packages: packages = self.__getPackage()
+
+			if 'serviceName' in packages:
+				self.__deleteActions(self.__getCompletePackageInfo(packages))
+			else:
+				for key, val in packages.iteritems():
+					self.__deleteActions(self.__getCompletePackageInfo(val, key))
 
 	def afterDelete(self, package):
 		return False
+
+	def __deleteActions(self, package):
+		getattr(self, self.getMethod('beforeDelete', self))(package)
+		self.currentDist.delete(package['serviceName'] + '*', package['repository'])
+		getattr(self, self.getMethod('afterDelete', self))(package)
 
 	def getDist(self, conf = False):
 		distName = ''
@@ -68,15 +80,28 @@ class RouterDist(Helper):
 		return self.currentDist
 
 	def __getPackage(self):
-		package = {}
-		if hasattr(self, 'packages'):
-			distName = self.currentDist.__class__.__name__
-			package = self.packages[distName] if distName in self.packages else self.packages
+		package = self.__getPackagesForCurDist()
 
 		if self.hasAttr(['packageAttr', 'defaultPackage', 'packages'], self):
 			package = self.getPackageInfo(self.packageAttr, self.attrs, package, self.defaultPackage)
 		elif not hasattr(self, 'packages'):
-			package = self.getAttr(['serviceName', 'repository', 'key'], self)
+			package = self.getAttr(self.defaultAttrNames, self)
 
-		if 'repository' in package: package['repository'] = self.currentDist.getRelease(package['repository'])
+		package = self.__getCompletePackageInfo(package)
+
+		if package['repository']: package['repository'] = self.currentDist.getRelease(package['repository'])
+		if not package['serviceName']: raise Exception('No serviceName in package data')
 		return package
+
+	def __getPackagesForCurDist(self):
+		packages = {}
+		if hasattr(self, 'packages') and self.currentDist:
+			checkDists = dict((key.lower(), val) for key, val in self.packages.iteritems())
+			distName = self.currentDist.__class__.__name__.lower()
+			packages = checkDists[distName] if distName in checkDists else self.packages
+
+		return packages
+
+	def __getCompletePackageInfo(self, package, indexName = False):
+		if indexName: package['__index'] = indexName
+		return self.mergeDicts(package, self.getAttr(self.defaultAttrNames, package))
