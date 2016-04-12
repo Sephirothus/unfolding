@@ -27,7 +27,7 @@ class RouterDist(Helper):
 		return False
 
 	def install(self):
-		package = self.__getPackage()
+		package = self.getPackage()
 		getattr(self, self.getMethod('beforeInstall', self))(package)
 		self.currentDist.install(package['serviceName'], package['repository'], package['key'])
 		getattr(self, self.getMethod('afterInstall', self))(package)
@@ -44,10 +44,10 @@ class RouterDist(Helper):
 
 	def delete(self):
 		if hasattr(self, 'packageAttr') and self.packageAttr in self.attrs:
-			self.__deleteActions(self.__getPackage())
+			self.__deleteActions(self.getPackage())
 		else: 
 			packages = self.__getPackagesForCurDist()
-			if not packages: packages = self.__getPackage()
+			if not packages: packages = self.getPackage()
 
 			if 'serviceName' in packages:
 				self.__deleteActions(self.__getCompletePackageInfo(packages))
@@ -79,7 +79,7 @@ class RouterDist(Helper):
 		self.currentDist = self.getClass('dists.' + distGroup)()
 		return self.currentDist
 
-	def __getPackage(self):
+	def getPackage(self):
 		package = self.__getPackagesForCurDist()
 
 		if self.hasAttr(['packageAttr', 'defaultPackage', 'packages'], self):
@@ -105,3 +105,26 @@ class RouterDist(Helper):
 	def __getCompletePackageInfo(self, package, indexName = False):
 		if indexName: package['__index'] = indexName
 		return self.mergeDicts(package, self.getAttr(self.defaultAttrNames, package))
+
+	def setPaths(self, additional = {}, paths = False):
+		if not paths: 
+			if not hasattr(self, 'paths'): raise Exception("There's no default attribute - paths")
+			paths = self.paths
+		
+		self.__iterPaths(paths, additional)
+		# calling second time, 'cause dict is not ordered and there can be dependencies
+		self.__iterPaths(paths, additional)
+
+	def __iterPaths(self, paths, additional):
+		for key, path in paths.iteritems():
+			var = re.search('\{\$(\w+)\}', path)
+			if var:
+				var = var.group(1)
+				change = False
+				if var in paths:
+					change = paths[var]
+				elif var in additional:
+					change = additional[var]
+
+				if change: 
+					paths[key] = paths[key].replace('{$'+var+'}', change)

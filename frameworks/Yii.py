@@ -1,4 +1,3 @@
-from Helper import Helper
 from dists.RouterDist import RouterDist
 
 from servers.Apache import Apache
@@ -21,7 +20,7 @@ class Yii(RouterDist):
 		'basic': {
 			'folders': ['assets/', 'runtime/'],
 			'path': '{$proj_folder}/web',
-			'confFolder': '{$proj_folder}/config/db.php'
+			'confFile': '{$proj_folder}/config/db.php'
 		},
 		'advanced': {
 			'folders': [
@@ -34,43 +33,40 @@ class Yii(RouterDist):
 	}
 
 	def install(self):
-		helper = Helper()
 		package = self.getPackage()
-		if not helper.isFolderNotEmpty(self.folder) or helper.question("Current folder " + self.folder + " is not empty. Remove it?"):
-			helper.rm(self.folder)
-			helper.composerProject(self.composerPath.replace('{$version}', package['index']) + ' ' + self.folder)
-			helper.execPackageMethod('install', self, package)
+		if not self.isFolderNotEmpty(self.folder) or self.question("Current folder " + self.folder + " is not empty. Remove it?"):
+			self.rm(self.folder)
+			self.composerProject(self.composerPath.replace('{$version}', package['index']) + ' ' + self.folder)
+			self.execPackageMethod('install', self, package)
 			
 	def configure(self):
-		helper = Helper()
 		package = self.getPackage()
 
 		print "-- Set chmod to runtime and assets"
-		helper.setChmod(package['folders'], self.folder)
+		self.setChmod(package['folders'], self.folder)
 
 		if self.server:
 			print "-- Creating " + self.server.name + " config"
-			helper.serverAddSite(self.server, self.siteName, package['path'])
+			self.serverAddSite(self.server, self.siteName, package['path'])
 
 		if all (k in self.attrs for k in ['db', 'user', 'password']):
 			dbConf = self.currentDist.execPackageMethod('getConf', self, package)
-			helper.saveFile(package['confFile'], dbConf)
+			self.saveFile(package['confFile'], dbConf)
 
 	def delete(self):
-		helper = Helper()
 		package = self.getPackage()
 		hosts = ['admin.' + self.siteName, self.siteName]
 		print "-- Remove site folder"
-		helper.rm(self.folder)
+		self.rm(self.folder)
 
 		if self.server:
 			print "-- Remove " + self.server.name + " config"
-			helper.serverRemoveSite(self.server, self.siteName, hosts)
+			self.serverRemoveSite(self.server, self.siteName, hosts)
 
 	def getPackage(self):
 		apache = Apache()
 		nginx = Nginx()
-		package = (Helper()).getPackageInfo('version', self.attrs, self.packages, self.defaultPackage)
+		package = self.getPackageInfo('version', self.attrs, self.packages, self.defaultPackage)
 		if 'folder' in self.attrs: self.folder = self.attrs['folder']
 		if 'siteName' in self.attrs: self.siteName = self.attrs['siteName']
 		if 'driver' in self.attrs: self.driver = self.attrs['driver']

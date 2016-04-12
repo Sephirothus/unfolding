@@ -97,6 +97,10 @@ class Helper:
 
 		self.rm('/tmp/' + fileName)
 
+	def makeInstall(self, path):
+		self.execute('sudo make -C ' + path)
+		self.execute('sudo make install -C '+ path)
+
 	def editFile(self, fileName, changes):
 		fileData = open(fileName, "r")
 		newData = fileData.read()
@@ -123,7 +127,22 @@ class Helper:
 		fileData.close()
 
 	def rm(self, files):
+		if type(files) is list: files = ' '.join(files)
 		self.execute('sudo rm -rf ' + files, True)
+
+	def mkdir(self, folder):
+		if type(folder) is list: folder = ' '.join(folder)
+		try:
+			os.makedirs(folder)
+			return True
+		except OSError:
+			return False
+
+	def cp(self, what, where):
+		self.execute('sudo cp ' + what + ' ' + where)
+
+	def rename(self, src, dst):
+		os.rename(src, dst)
 
 	def checkFile(self, fileName):
 		return os.path.isfile(fileName)

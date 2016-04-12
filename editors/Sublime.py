@@ -1,34 +1,36 @@
-from Helper import Helper
 from dists.RouterDist import RouterDist
 
 class Sublime(RouterDist):
 
 	name = "Sublime Text"
 
-	mainFolder = '{$home_folder}.config/sublime-text-{$version}/'
-	installedPackagesFolder = '{$main_folder}Installed\ Packages/'
-	packagesFolder = '{$main_folder}Packages/'
-	userSettingsFolder = '{$main_folder}Packages/User/'
-
 	defaultPackage = '3'
+	packageAttr = 'version'
 	packages = {
-		'2': {
-			'command': 'sublime-text',
-			'rep': 'ppa:webupd8team/sublime-text-2'
-		},
-		'3': {
-			'command': 'sublime-text-installer',
-			'rep': 'ppa:webupd8team/sublime-text-3'
+		'Debian': {
+			'2': {
+				'serviceName': 'sublime-text',
+				'repository': 'ppa:webupd8team/sublime-text-2'
+			},
+			'3': {
+				'serviceName': 'sublime-text-installer',
+				'repository': 'ppa:webupd8team/sublime-text-3'
+			}
 		}
 	}
-	
-	def installUbuntu(self):
-		package = self.currentDist.getPackageInfo('version', self.attrs, self.packages, self.defaultPackage)
-		self.currentDist.aptGet(package['command'], package['rep'])
+	paths = {
+		'mainFolder': '{$homeFolder}.config/sublime-text-{$version}/',
+		'installedPackagesFolder': '{$mainFolder}Installed\ Packages/',
+		'packagesFolder': '{$mainFolder}Packages/',
+		'userSettingsFolder': '{$mainFolder}Packages/User/'
+	}
 
 	def configure(self):
-		self.setPaths()
-		for name, package in self.getPackages().iteritems():
+		self.setPaths({
+			'homeFolder': self.homeFolder(), 
+			'version': self.attrs['version'] if 'version' in self.attrs else self.defaultPackage
+		})
+		for name, package in self.getSublimePackages().iteritems():
 			print '-- install package "' + name + '"'
 			if type(package) is dict:
 				if 'sublimeSupport' in package and 'version' in self.attrs and package['sublimeSupport'] != self.attrs['version']:
@@ -49,29 +51,21 @@ class Sublime(RouterDist):
 		# package control https://packagecontrol.io/installation#ST3
 		# add packages https://mattstauffer.co/blog/sublime-text-3-for-php-developers
 
-	def checkUbuntu(self):
+	def checkDebian(self):
 		for key, val in self.packages.iteritems():
-			if self.currentDist.checkAptGet(val['command']): return True
+			if self.currentDist.checkAptGet(val['serviceName']): return True
 		return False
 
-	def setPaths(self):
-		self.mainFolder = self.mainFolder.replace('{$home_folder}', (Helper()).homeFolder())
-		self.mainFolder = self.mainFolder.replace('{$version}', self.attrs['version'] if 'version' in self.attrs else self.defaultPackage)
-		self.installedPackagesFolder = self.installedPackagesFolder.replace('{$main_folder}', self.mainFolder)
-		self.packagesFolder = self.packagesFolder.replace('{$main_folder}', self.mainFolder)
-		self.userSettingsFolder = self.userSettingsFolder.replace('{$main_folder}', self.mainFolder)
-
 	def installPackage(self, packageUrl, packageType='packages'):
-		helper = Helper()
 		folder = self.packagesFolder if packageType == 'packages' else self.installedPackagesFolder
 		filePath = folder + '/' + packageUrl.rsplit('/', 1)[1]
-		if not helper.checkFile(filePath): helper.wgetUnpack(packageUrl, folder)
+		if not self.checkFile(filePath): self.wgetUnpack(packageUrl, folder)
 
 	def setSettings(self, fileName, fileContent):
-		(Helper()).fileActions(self.userSettingsFolder + fileName, 'a', fileContent)
+		self.fileActions(self.userSettingsFolder + fileName, 'a', fileContent)
 
 	# sublime packages list
-	def getPackages(self):
+	def getSublimePackages(self):
 		return {
 			'Package Control': 'https://packagecontrol.io/Package%20Control.sublime-package',
 			'PHP Companion': self.phpCompanionConf(),

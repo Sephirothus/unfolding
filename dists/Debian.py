@@ -70,3 +70,12 @@ class Debian(Helper):
 		self.execute('dpkg -i ' + filePath)
 		self.rm(filePath)
 		self.aptGetUpdate()
+
+	def initScriptActions(self, name, action):
+		self.execute('sudo update-rc.d ' + name + ' ' + action)
+
+	def updateInitScript(self, name):
+		self.initScriptActions(name, 'defaults')
+
+	def removeInitScript(self, name):
+		self.initScriptActions(name, 'remove')

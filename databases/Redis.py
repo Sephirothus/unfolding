@@ -4,30 +4,57 @@ class Redis(RouterDist):
 
 	name = 'Redis'
 
-	def installUbuntu(self):
-		port = self.attrs['port'] if hasattr(self, 'attrs') and 'port' in self.attrs else '6379'
-		archPath = '/tmp/redis-stable/'
+	checkName = 'redis-server'
+	serviceName = 'redis_{$port}'
 
-		self.currentDist.wgetUnpack('http://download.redis.io/redis-stable.tar.gz')
-		self.currentDist.execute('sudo make -C ' + archPath)
-		self.currentDist.execute('sudo make install -C ' + archPath)
+	downloadUrl = 'http://download.redis.io/redis-stable.tar.gz'
+	defaultPort = '6379'
 
-		self.currentDist.execute('sudo mkdir /etc/redis')
-		self.currentDist.execute('sudo mkdir /var/redis')
-		self.currentDist.execute('sudo cp ' + archPath + 'utils/redis_init_script /etc/init.d/redis_' + port)
+	paths = {
+		'archPath': '/tmp/redis-stable/',
+		'archInitDPath': '{$archPath}utils/redis_init_script',
+		'archConfPath': '{$archPath}redis.conf',
+		'etcFolder': '/etc/redis/',
+		'varFolder': '/var/redis/',
+		'initDPath': '/etc/init.d/{$serviceName}',
+		'confPath': '{$etcFolder}{$port}.conf',
+		'deletePath': '/usr/local/bin/redis*'
+	}
+	confChanges = {
+		'daemonize no': 'daemonize yes',
+		'pidfile /var/run/redis.pid': 'pidfile /var/run/{$serviceName}.pid',
+		'logfile ""': 'logfile /var/log/{$serviceName}.log',
+		'dir ./': 'dir {$varFolder}{$port}'
+	}
+	initDConf = {
+		'REDISPORT=6379': 'REDISPORT={$port}'
+	}
 
-		self.currentDist.editFile('/etc/init.d/redis_6379', {'REDISPORT=6379': 'REDISPORT=' + port})
+	def installDebian(self):
+		port = self.attrs['port'] if 'port' in self.attrs else self.defaultPort
+		self.init()
 
-		self.currentDist.execute('sudo cp ' + archPath + 'redis.conf /etc/redis/' + port + '.conf')
-		self.currentDist.execute('sudo mkdir /var/redis/' + port)
+		self.wgetUnpack(self.downloadUrl)
+		self.makeInstall(self.paths['archPath'])
 
-		self.currentDist.editFile('/etc/redis/' + port + '.conf', {
-			'daemonize no': 'daemonize yes',
-			'pidfile /var/run/redis.pid': 'pidfile /var/run/redis_' + port + '.pid',
-			'logfile ""': 'logfile /var/log/redis_' + port + '.log',
-			'dir ./': 'dir /var/redis/' + port
-		})
+		self.mkdir([self.paths['etcFolder'], self.paths['varFolder'] + port])
+		self.cp(self.paths['archInitDPath'], self.paths['initDPath'])
+		self.editFile(self.paths['initDPath'], self.initDConf)
+		self.cp(self.paths['archConfPath'], self.paths['confPath'])
+		self.editFile(self.paths['confPath'], self.confChanges)
 
-		self.currentDist.execute('sudo update-rc.d redis_' + port + ' defaults')
-		self.currentDist.execute('sudo service redis_' + port + ' start')
-		self.currentDist.execute('sudo rm -rf ' + archPath)
+		self.currentDist.updateInitScript(self.serviceName)
+		self.currentDist.servStart(self.serviceName)
+		self.rm(self.paths['archPath'])
+
+	def delete(self):
+		self.init()
+		self.rm([self.paths['etcFolder'], self.paths['varFolder'], self.paths['initDPath'], self.paths['deletePath']])
+		self.currentDist.removeInitScript(self.serviceName)
+
+	def init(self):
+		port = self.attrs['port'] if 'port' in self.attrs else self.defaultPort
+		self.serviceName = self.serviceName.replace('{$port}', port)
+		self.setPaths({'port': port, 'serviceName': self.serviceName})
+		self.setPaths({'port': port, 'varFolder': self.paths['varFolder'], 'serviceName': self.serviceName}, self.confChanges)
+		self.setPaths({'port': port}, self.initDConf)		
