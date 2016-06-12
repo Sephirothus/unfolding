@@ -12,6 +12,7 @@ class Yii(RouterDist):
 
 	composerPath = 'yiisoft/yii2-app-{$version}'
 	defaultPackage = 'basic'
+	packageAttr = 'version'
 	driver = 'mysql'
 	folder = '/var/www/yii-application'
 	siteName = 'yii.dev'
@@ -36,7 +37,7 @@ class Yii(RouterDist):
 		package = self.getPackage()
 		if not self.isFolderNotEmpty(self.folder) or self.question("Current folder " + self.folder + " is not empty. Remove it?"):
 			self.rm(self.folder)
-			self.composerProject(self.composerPath.replace('{$version}', package['index']) + ' ' + self.folder)
+			self.composerProject(self.composerPath.replace('{$version}', package['__index']) + ' ' + self.folder)
 			self.execPackageMethod('install', self, package)
 			
 	def configure(self):
@@ -53,6 +54,9 @@ class Yii(RouterDist):
 			dbConf = self.currentDist.execPackageMethod('getConf', self, package)
 			self.saveFile(package['confFile'], dbConf)
 
+	def check(self):
+		return False
+
 	def delete(self):
 		package = self.getPackage()
 		hosts = ['admin.' + self.siteName, self.siteName]
@@ -66,7 +70,7 @@ class Yii(RouterDist):
 	def getPackage(self):
 		apache = Apache()
 		nginx = Nginx()
-		package = self.getPackageInfo('version', self.attrs, self.packages, self.defaultPackage)
+		package = self.getPackageInfo(self.packageAttr, self.attrs, self.packages, self.defaultPackage)
 		if 'folder' in self.attrs: self.folder = self.attrs['folder']
 		if 'siteName' in self.attrs: self.siteName = self.attrs['siteName']
 		if 'driver' in self.attrs: self.driver = self.attrs['driver']
