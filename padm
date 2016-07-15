@@ -43,12 +43,11 @@ try:
 	action = options['-a']
 	helper = Helper()
 	conf = {}
-	fileName = 'my_config.json'
+	confFileName = 'my_config.json'
+	packagesFileName = 'dist_packages.json'
 
-	if helper.checkFile(fileName):
-		with open(fileName) as data_file:
-			conf = json.load(data_file)
-
+	conf = helper.getJsonData(confFileName)
+	if conf:
 		queue = confClass.createQueue(conf)
 	else:
 		queue = confClass.createQueue(confClass.createConf())
@@ -66,7 +65,12 @@ try:
 		router = RouterDist()
 		dist = router.getDist(conf)
 		distName = dist.__class__.__name__
+		allPackages = helper.getJsonData(packagesFileName)
 		for el in queue:
+			curClassName = el.__class__.__name__.lower()
+			# if there is packages for current class, we set it
+			if curClassName in allPackages:
+				el.packages = allPackages[curClassName]
 			# set current distribution as an object attribute
 			el.currentDist = dist
 			helper.createBlock(helper.ucfirst(action) + ' ' + el.name)

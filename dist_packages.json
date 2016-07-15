@@ -1,0 +1,52 @@
+{
+	"mysql": {
+		"Debian": {
+			"mysql": {
+				"serviceName": "mysql-server"
+			},
+			"mariadb": {
+				"serviceName": "mariadb-server",
+				"deb_conf": "mariadb-server mariadb-server/oneway_migration	boolean	true"
+			},
+			"percona": {
+				"serviceName": "percona-server-server",
+				"download_url": "https://repo.percona.com/apt/percona-release_0.1-3.{$lsb_release}_all.deb",
+				"deb_conf": "percona-server-server percona-server-server/postrm_remove_databases boolean true"
+			}
+		},
+		"Gentoo": {
+			"mysql": {
+				"serviceName": "dev-db/mysql"
+			},
+			"mariadb": {
+				"serviceName": "dev-db/mariadb"
+			},
+			"percona": {
+				"serviceName": "dev-db/percona-server"
+			}
+		}
+	},
+	"mongo": {
+		"Debian": {
+			"serviceName": "mongodb-org",
+			"repository": "deb http://repo.mongodb.org/apt/ubuntu {$lsb_release}/mongodb-org/3.2 multiverse",
+			"key": "--keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927"
+		}
+	},
+	"rabbitmq": {
+		"Debian": {
+			"serviceName": "rabbitmq-server",
+			"repository": "deb http://www.rabbitmq.com/debian/ testing main",
+			"key": "http://www.rabbitmq.com/rabbitmq-signing-key-public.asc"
+		}
+	},
+	"sphinx": {
+		"Debian": {
+			"serviceName": "sphinxsearch"
+		}
+	},
+	"phpstorm": {
+		"url": "http://download.jetbrains.com/webide/PhpStorm-9.0.2.tar.gz",
+		
+	},
+}

@@ -8,22 +8,6 @@ class Mysql(RouterDist):
 	defaultRootPass = '1'
 	defaultPackage = 'mysql'
 	packageAttr = 'build'
-	packages = {
-		'Debian': {
-			'mysql': {
-				'serviceName': 'mysql-server'
-			},
-			'mariadb': {
-				'serviceName': 'mariadb-server',
-				'deb_conf': 'mariadb-server mariadb-server/oneway_migration	boolean	true'
-			},
-			'percona': {
-				'serviceName': 'percona-server-server',
-				'download_url': 'https://repo.percona.com/apt/percona-release_0.1-3.{$lsb_release}_all.deb',
-				'deb_conf': 'percona-server-server percona-server-server/postrm_remove_databases boolean true'
-			}
-		}
-	}
 	
 	def beforeInstallDebian(self, package):
 		self.debConfSetSelections([
@@ -48,7 +32,7 @@ class Mysql(RouterDist):
 			self.mysqlCommand('CREATE DATABASE IF NOT EXISTS ' + self.attrs['db'], user, password)
 
 	# packages installs
-	def perconaInstall(self, data):
+	def perconaInstallDebian(self, data):
 		self.wgetAddpkg(self.currentDist.getRelease(data['download_url']))
 
 	def mariadbInstallDebian(self, data):

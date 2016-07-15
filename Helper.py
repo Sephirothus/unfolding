@@ -112,6 +112,15 @@ class Helper:
 		fileData.write(newData)
 		fileData.close()
 
+	def getJsonData(self, fileName):
+		if not self.checkFile(fileName):
+			return False
+
+		data = {}
+		with open(fileName) as data_file:
+			data = json.load(data_file)
+		return data
+
 	def addHost(self, host):
 		self.fileActions(self.hostsFolder, 'a', '\n' + host)
 
